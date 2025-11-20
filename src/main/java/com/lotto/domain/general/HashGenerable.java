@@ -1,4 +1,4 @@
-package com.lotto.domain.numberreceiver;
+package com.lotto.domain.general;
 
 public interface HashGenerable {
 

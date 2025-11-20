@@ -1,8 +1,8 @@
-package com.lotto.domain.numberreceiver;
+package com.lotto.domain.general;
 
 import java.util.UUID;
 
-class HashGenerator implements HashGenerable {
+public class HashGenerator implements HashGenerable {
 
     @Override
     public String generateHash() {
