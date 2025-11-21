@@ -213,7 +213,6 @@ class ResultCheckerFacadeTest {
 
         List<TicketDto> list = facade.retrieveWinningTickets(drawDate);
 
-        System.out.println(list);
         // then
         assertThat(list).isEmpty();
 

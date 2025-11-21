@@ -1,6 +1,5 @@
 package com.lotto.domain.numberreceiver;
 
-import com.lotto.domain.general.DrawDateGenerator;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.stub.HashGeneratorStub;
