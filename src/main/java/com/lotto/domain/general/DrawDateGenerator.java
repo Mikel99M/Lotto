@@ -13,7 +13,6 @@ public class DrawDateGenerator {
 
     public LocalDateTime generateNextDrawDate(LocalDateTime now) {
 
-        // Always take the NEXT Saturday (never today)
         LocalDateTime nextDrawDate = now.with(TemporalAdjusters.next(DRAW_DAY));
 
         return nextDrawDate
