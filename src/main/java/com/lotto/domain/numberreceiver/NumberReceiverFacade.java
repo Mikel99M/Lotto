@@ -12,13 +12,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-/// klient podate 6 liczb
-/// liczby musza byc zakrsie 1-99
-/// liczby nie maja sie powtarzac
-/// klient dostaje informacje o dacie losowania
-/// klient dostaje informajce o swoim indywidualnym identyfikatorze losowania
-
-//@Service
 @AllArgsConstructor
 public class NumberReceiverFacade implements NumberReceiver {
 

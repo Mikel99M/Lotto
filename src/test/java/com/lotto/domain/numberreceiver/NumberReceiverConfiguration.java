@@ -2,8 +2,6 @@ package com.lotto.domain.numberreceiver;
 
 import com.lotto.domain.general.DrawDateGenerator;
 import com.lotto.domain.general.HashGenerable;
-import com.lotto.domain.general.HashGenerator;
-import com.lotto.domain.stub.HashGeneratorStub;
 
 import java.time.Clock;
 
