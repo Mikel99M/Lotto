@@ -4,7 +4,6 @@ import com.lotto.domain.general.DrawDateGenerator;
 import com.lotto.domain.general.NumberReceiver;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
-import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultchecker.dto.ResultDto;
 import lombok.AllArgsConstructor;
@@ -17,10 +16,10 @@ import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
-public class ResultCheckerFacade {
+public class ResultCheckerFacade implements ResultChecker {
 
     private final WinningNumbersGenerator winningNumbersGenerator;
-    private final NumberReceiverFacade numberReceiver;
+    private final NumberReceiver numberReceiver;
     private final DrawDateGenerator drawDateGenerator;
 
     public ResultDto checkResult(LocalDate drawDate) {
@@ -54,10 +53,6 @@ public class ResultCheckerFacade {
                 .toList();
     }
 
-    public boolean thereIsWinningTicket(LocalDate drawDate) {
-        return !retrieveWinningTickets(drawDate).isEmpty();
-    }
-
     public Optional<TicketDto> findWinningTicketByHash(String hash) {
         TicketDto ticketDto = numberReceiver.fetchTicketByHash(hash);
 
@@ -68,5 +63,10 @@ public class ResultCheckerFacade {
                 .filter(winningTicket -> winningTicket.hash().equals(hash))
                 .findFirst();
     }
+
+    public boolean thereIsWinningTicket(LocalDate drawDate) {
+        return !retrieveWinningTickets(drawDate).isEmpty();
+    }
+
 
 }

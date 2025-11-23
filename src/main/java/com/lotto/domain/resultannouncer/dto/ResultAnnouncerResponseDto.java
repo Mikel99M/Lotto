@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ResultAnnouncerResponseDto(
-        ResponseDto responseDto,
+        ResponseDto response,
         String message
 ) {
 }

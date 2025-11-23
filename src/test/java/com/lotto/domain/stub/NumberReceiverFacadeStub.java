@@ -1,6 +1,7 @@
 package com.lotto.domain.stub;
 
 import com.lotto.domain.general.NumberReceiver;
+import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 
@@ -32,6 +33,16 @@ public class NumberReceiverFacadeStub implements NumberReceiver {
     @Override
     public LocalDateTime generateNextDrawDate(LocalDateTime now) {
         return null;
+    }
+
+    @Override
+    public TicketDto fetchTicketByHash(final String hash) {
+        for (TicketDto ticket : tickets) {
+            if (ticket.hash().equals(hash)) {
+                return ticket;
+            }
+        }
+        throw new TicketNotFoundException("Ticket not found for hash: " + hash);
     }
 }
 

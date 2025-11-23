@@ -31,8 +31,8 @@ class TicketRepositoryImplementation implements TicketRepository {
     }
 
     @Override
-    public Ticket findByHash(final String hash) {
-        return tickets.get(hash);
+    public Optional<Ticket> findByHash(final String hash) {
+        return Optional.ofNullable(tickets.get(hash));
     }
 
     @Override

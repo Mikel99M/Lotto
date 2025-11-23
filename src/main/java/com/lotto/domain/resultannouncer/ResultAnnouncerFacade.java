@@ -1,13 +1,14 @@
 package com.lotto.domain.resultannouncer;
 
-import com.lotto.domain.numberreceiver.NumberReceiverFacade;
+import com.lotto.domain.general.NumberReceiver;
 import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultannouncer.dto.ResponseDto;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
-import com.lotto.domain.resultchecker.ResultCheckerFacade;
+import com.lotto.domain.resultchecker.ResultChecker;
 import lombok.AllArgsConstructor;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -15,8 +16,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class ResultAnnouncerFacade {
 
-    private final ResultCheckerFacade resultCheckerFacade;
-    private final NumberReceiverFacade numberReceiverFacade;
+    private final ResultChecker resultCheckerFacade;
+    private final NumberReceiver numberReceiverFacade;
+    private final Clock clock;
 
     public ResultAnnouncerResponseDto checkResult(String ticketHash) {
 
@@ -42,7 +44,7 @@ public class ResultAnnouncerFacade {
     }
 
     private boolean isBeforeDrawDate(LocalDateTime drawDate) {
-        return LocalDateTime.now().isBefore(drawDate);
+        return LocalDateTime.now(clock).isBefore(drawDate);
     }
 
     private ResultAnnouncerResponseDto response(TicketDto ticket, boolean isWinner, String message) {
