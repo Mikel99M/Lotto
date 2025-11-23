@@ -12,19 +12,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-/// klient podate 6 liczb
-/// liczby musza byc zakrsie 1-99
-/// liczby nie maja sie powtarzac
-/// klient dostaje informacje o dacie losowania
-/// klient dostaje informajce o swoim indywidualnym identyfikatorze losowania
-
-//@Service
 @AllArgsConstructor
 public class NumberReceiverFacade implements NumberReceiver {
 
     private final NumberValidator numberValidator;
     private final TicketRepository repository;
-    private final Clock clock ;
+    private final Clock clock;
     private final HashGenerable hashGenerator;
     private final DrawDateGenerator drawDateGenerator;
 
@@ -58,6 +51,18 @@ public class NumberReceiverFacade implements NumberReceiver {
                 .stream()
                 .map(TicketMapper::mapFromTicket)
                 .toList();
+    }
+
+    @Override
+    public TicketDto fetchTicketByHash(final String hash) {
+        Ticket ticket = repository.findByHash(hash)
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found for hash: " + hash));
+
+        return TicketDto.builder()
+                .numbers(ticket.numbersFromUser())
+                .drawDate(ticket.drawDate())
+                .hash(ticket.hash())
+                .build();
     }
 
     public LocalDateTime generateNextDrawDate(LocalDateTime now) {

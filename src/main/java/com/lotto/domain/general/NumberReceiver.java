@@ -5,6 +5,7 @@ import com.lotto.domain.numberreceiver.dto.TicketDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface NumberReceiver {
@@ -15,4 +16,5 @@ public interface NumberReceiver {
 
     LocalDateTime generateNextDrawDate(LocalDateTime now);
 
+    TicketDto fetchTicketByHash(String hash);
 }
