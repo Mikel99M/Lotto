@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
-public class ResultCheckerFacade {
+public class ResultCheckerFacade implements ResultChecker {
 
     private final WinningNumbersGenerator winningNumbersGenerator;
     private final NumberReceiver numberReceiver;
@@ -53,10 +53,6 @@ public class ResultCheckerFacade {
                 .toList();
     }
 
-    public boolean thereIsWinningTicket(LocalDate drawDate) {
-        return !retrieveWinningTickets(drawDate).isEmpty();
-    }
-
     public Optional<TicketDto> findWinningTicketByHash(String hash) {
         TicketDto ticketDto = numberReceiver.fetchTicketByHash(hash);
 
@@ -67,5 +63,10 @@ public class ResultCheckerFacade {
                 .filter(winningTicket -> winningTicket.hash().equals(hash))
                 .findFirst();
     }
+
+    public boolean thereIsWinningTicket(LocalDate drawDate) {
+        return !retrieveWinningTickets(drawDate).isEmpty();
+    }
+
 
 }

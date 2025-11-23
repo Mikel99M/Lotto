@@ -14,11 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class WinningNumbersGeneratorFacadeTest {
 
     WinningNumbersRepositoryImplementation repository = new WinningNumbersRepositoryImplementation();
-    NumbersGeneratorStub numbersGenerator = new NumbersGeneratorStub();
+    NumbersGeneratorStub numbersGeneratorStub = new NumbersGeneratorStub();
     DrawDateGeneratorStub drawDateGeneratorStub = new DrawDateGeneratorStub();
 
     WinningNumbersGeneratorFacade facade =
-            new WinningNumbersConfiguration().createForTest(repository, numbersGenerator, drawDateGeneratorStub);
+            new WinningNumbersConfiguration().createForTest(repository, numbersGeneratorStub, drawDateGeneratorStub);
 
     LocalDateTime currentDateTime = LocalDateTime.of(2025, 11, 9, 0, 0);
 
