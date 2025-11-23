@@ -23,7 +23,7 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     public WinningNumbersDto generate() {
         LocalDateTime drawDate = drawDateGenerator.generateNextDrawDate(LocalDateTime.now());
         String hash = hashGenerator.generateHash();
-        Set<Integer> numbers = numbersGenerator.generateSixNumbers();
+        Set<Integer> numbers = numbersGenerator.generateSixRandomNumbers();
 
         WinningNumbers winningNumbers = new WinningNumbers.WinningNumbersBuilder()
                 .hash(hash)

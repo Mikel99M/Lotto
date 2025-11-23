@@ -2,24 +2,30 @@ package com.lotto.domain.numbergenerator;
 
 import com.lotto.domain.general.NumbersGenerable;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 @AllArgsConstructor
 public class NumbersGenerator implements NumbersGenerable {
 
-    private final Random random;
+    private static final int LOWER_BAND = 1;
+    private static final int UPPER_BAND = 99;
 
-    public Set<Integer> generateSixNumbers() {
-        int MIN = 1, MAX = 99;
-        Set<Integer> numbers = new HashSet<>();
-        while (numbers.size() < 6) {
-            numbers.add(random.nextInt(MAX) + MIN);
+    private final OneRandomNumberFetcher client;
+
+    public Set<Integer> generateSixRandomNumbers() {
+        Set<Integer> winningNumbers = new HashSet<>();
+        while (isAmountOfNumbersLowerThanSix(winningNumbers)) {
+            OneRandomNumberResponseDto randomNumberResponseDto = client.retrieveOneRandomNumber(LOWER_BAND, UPPER_BAND);
+            int randomNumber = randomNumberResponseDto.number();
+            winningNumbers.add(randomNumber);
         }
-        return numbers;
+        return winningNumbers;
+    }
+
+    private boolean isAmountOfNumbersLowerThanSix(Set<Integer> winningNumbers) {
+        return winningNumbers.size() < 6;
     }
 
 }

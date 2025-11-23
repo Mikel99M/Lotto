@@ -4,7 +4,6 @@ import com.lotto.domain.general.DrawDateGenerator;
 import com.lotto.domain.general.NumberReceiver;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
-import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultchecker.dto.ResultDto;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,7 @@ import java.util.Set;
 public class ResultCheckerFacade {
 
     private final WinningNumbersGenerator winningNumbersGenerator;
-    private final NumberReceiverFacade numberReceiver;
+    private final NumberReceiver numberReceiver;
     private final DrawDateGenerator drawDateGenerator;
 
     public ResultDto checkResult(LocalDate drawDate) {

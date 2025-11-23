@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class NumbersGeneratorStub implements NumbersGenerable {
 
-    public Set<Integer> generateSixNumbers() {
+    public Set<Integer> generateSixRandomNumbers() {
         return Set.of(1, 2, 3, 4, 5, 6);
     }
 }

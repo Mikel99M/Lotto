@@ -33,5 +33,10 @@ public class NumberReceiverFacadeStub implements NumberReceiver {
     public LocalDateTime generateNextDrawDate(LocalDateTime now) {
         return null;
     }
+
+    @Override
+    public TicketDto fetchTicketByHash(final String hash) {
+        return null;
+    }
 }
 
