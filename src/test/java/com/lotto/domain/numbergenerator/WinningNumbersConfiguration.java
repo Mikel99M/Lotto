@@ -8,7 +8,7 @@ class WinningNumbersConfiguration {
 
     public WinningNumbersGeneratorFacade createForTest(
             WinningNumbersRepository repository,
-            NumbersGenerable numbersGenerator,
+            RandomNumberGenerable numbersGenerator,
             DrawDateGenerator drawDateGenerator) {
 
         return new WinningNumbersGeneratorFacade(

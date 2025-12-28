@@ -15,7 +15,7 @@ import java.util.Set;
 public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
 
     private final WinningNumbersRepository winningNumbersRepository;
-    private final NumbersGenerable numbersGenerator;
+    private final RandomNumberGenerable numbersGenerator;
     private final WinningNumbersMapper winningNumbersMapper;
     private final HashGenerable hashGenerator;
     private final DrawDateGenerator drawDateGenerator;
@@ -23,11 +23,12 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     public WinningNumbersDto generate() {
         LocalDateTime drawDate = drawDateGenerator.generateNextDrawDate(LocalDateTime.now());
         String hash = hashGenerator.generateHash();
-        Set<Integer> numbers = numbersGenerator.generateSixRandomNumbers();
+        SixRandomNumbersDto dto = numbersGenerator.generateSixRandomNumbers();
+        Set<Integer> winningNums = dto.numbers();
 
         WinningNumbers winningNumbers = new WinningNumbers.WinningNumbersBuilder()
                 .hash(hash)
-                .numbers(numbers)
+                .numbers(winningNums)
                 .date(drawDate)
                 .build();
         WinningNumbers savedNumbers = winningNumbersRepository.save(winningNumbers);

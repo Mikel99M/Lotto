@@ -74,5 +74,6 @@ class WinningNumbersGeneratorFacadeTest {
 
         // then
         assertThat(retrieved).isEqualTo(expectedResult);
+
     }
 }

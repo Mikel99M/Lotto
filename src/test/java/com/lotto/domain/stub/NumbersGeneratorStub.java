@@ -1,12 +1,13 @@
 package com.lotto.domain.stub;
 
-import com.lotto.domain.general.NumbersGenerable;
+import com.lotto.domain.numbergenerator.RandomNumberGenerable;
+import com.lotto.domain.numbergenerator.SixRandomNumbersDto;
 
 import java.util.Set;
 
-public class NumbersGeneratorStub implements NumbersGenerable {
+public class NumbersGeneratorStub implements RandomNumberGenerable {
 
-    public Set<Integer> generateSixRandomNumbers() {
-        return Set.of(1, 2, 3, 4, 5, 6);
+    public SixRandomNumbersDto generateSixRandomNumbers() {
+        return new SixRandomNumbersDto(Set.of(1, 2, 3, 4, 5, 6));
     }
 }
