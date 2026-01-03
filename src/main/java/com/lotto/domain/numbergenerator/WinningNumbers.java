@@ -1,16 +1,20 @@
 package com.lotto.domain.numbergenerator;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
-class WinningNumbers {
+@Getter
+@Setter
+public class WinningNumbers {
 
     @Id
-    String hash;
-    Set<Integer> numbers;
-    LocalDateTime date;
+    private String hash;
+    private Set<Integer> numbers;
+    private LocalDateTime date;
 }

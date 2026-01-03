@@ -1,13 +1,42 @@
 package com.lotto.feature;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.lotto.BaseIntegrationTest;
+import com.lotto.domain.numbergenerator.WinningNumbersGeneratorFacade;
+import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 public class HappyPathIntegrationTest extends BaseIntegrationTest {
 
+    @Autowired
+    WinningNumbersGeneratorFacade winningNumbersGeneratorFacade;
+
     @Test
-    void f() throws Exception {
+    void f() {
         //    step 1: external service returns 6 random numbers (1,2,3,4,5,6)
+        // given
+        wireMockServer.stubFor(
+                WireMock.get(urlPathEqualTo("/api/v1.0/random"))
+                        .withQueryParam("min", equalTo("1"))
+                        .withQueryParam("max", equalTo("99"))
+                        .withQueryParam("count", equalTo("6"))
+                        .willReturn(WireMock.aResponse()
+                                .withStatus(HttpStatus.OK.value())
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("""
+                                        [1, 2, 3, 4, 5, 6]
+                                        """.trim()
+                                )));
+        WinningNumbersDto result = winningNumbersGeneratorFacade.generate();
+        System.out.println(result);
+
+        // when
+        // then
 
 
         //    step 2: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:19.11.2022 12:00 (Saturday), TicketId: sampleTicketId)
