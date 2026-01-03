@@ -42,7 +42,7 @@ public class ResultAnnouncerFacadeTest {
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("test_hash");
 
         // then
-        assertThat(result.message()).isEqualTo(ResponseMesseges.NO_TICKET_WITH_THIS_HASH_FOUND.info);
+        assertThat(result.message()).isEqualTo(ResponseMessages.NO_TICKET_WITH_THIS_HASH_FOUND.info);
 
     }
 
@@ -64,7 +64,7 @@ public class ResultAnnouncerFacadeTest {
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("test_hash2");
 
         // then
-        assertThat(result.message()).isEqualTo(ResponseMesseges.IT_IS_BEFORE_DRAW_DATE.info);
+        assertThat(result.message()).isEqualTo(ResponseMessages.IT_IS_BEFORE_DRAW_DATE.info);
 
     }
 
@@ -87,7 +87,7 @@ public class ResultAnnouncerFacadeTest {
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("test_hash3");
 
         // then
-        assertThat(result.message()).isEqualTo(ResponseMesseges.TICKET_HAS_WON.info);
+        assertThat(result.message()).isEqualTo(ResponseMessages.TICKET_HAS_WON.info);
 
     }
 
@@ -117,7 +117,7 @@ public class ResultAnnouncerFacadeTest {
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("loosing_hash");
 
         // then
-        assertThat(result.message()).isEqualTo(ResponseMesseges.TICKET_HAS_LOST.info);
+        assertThat(result.message()).isEqualTo(ResponseMessages.TICKET_HAS_LOST.info);
 
     }
 
@@ -136,7 +136,7 @@ public class ResultAnnouncerFacadeTest {
         ResultAnnouncerResponseDto result = resultAnnouncerFacade.checkResult("test_hash5");
 
         // then
-        assertThat(result.message()).isEqualTo(ResponseMesseges.TICKET_HAS_WON.info);
+        assertThat(result.message()).isEqualTo(ResponseMessages.TICKET_HAS_WON.info);
         assertThat(result.response().hash()).isEqualTo("test_hash5");
         assertThat(result.response().drawDate()).isEqualTo(LocalDateTime.of(2025, 11, 8, 20, 0));
         assertThat(result.response().numbers()).isEqualTo(numbers);

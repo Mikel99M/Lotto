@@ -1,6 +1,6 @@
 package com.lotto.domain.resultannouncer;
 
-public enum ResponseMesseges {
+public enum ResponseMessages {
 
     NO_TICKET_WITH_THIS_HASH_FOUND("No ticket with this hash found"),
     TICKET_HAS_WON("Ticket has won"),
@@ -9,7 +9,7 @@ public enum ResponseMesseges {
 
     final String info;
 
-    ResponseMesseges(String info) {
+    ResponseMessages(String info) {
         this.info = info;
     }
 

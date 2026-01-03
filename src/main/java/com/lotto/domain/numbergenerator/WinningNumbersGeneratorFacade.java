@@ -2,7 +2,6 @@ package com.lotto.domain.numbergenerator;
 
 import com.lotto.domain.general.DrawDateGenerator;
 import com.lotto.domain.general.HashGenerable;
-import com.lotto.domain.general.NumbersGenerable;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import lombok.AllArgsConstructor;
@@ -19,11 +18,12 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     private final WinningNumbersMapper winningNumbersMapper;
     private final HashGenerable hashGenerator;
     private final DrawDateGenerator drawDateGenerator;
+    private final WinningNumbersGeneratorFacadeConfigurationProperties properties;
 
     public WinningNumbersDto generate() {
         LocalDateTime drawDate = drawDateGenerator.generateNextDrawDate(LocalDateTime.now());
         String hash = hashGenerator.generateHash();
-        SixRandomNumbersDto dto = numbersGenerator.generateSixRandomNumbers();
+        SixRandomNumbersDto dto = numbersGenerator.generateSixRandomNumbers(properties.lowerBand(), properties.upperBand());
         Set<Integer> winningNums = dto.numbers();
 
         WinningNumbers winningNumbers = new WinningNumbers.WinningNumbersBuilder()
@@ -33,8 +33,8 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
                 .build();
         WinningNumbers savedNumbers = winningNumbersRepository.save(winningNumbers);
         return new WinningNumbersDto(
-                savedNumbers.numbers,
-                savedNumbers.date
+                savedNumbers.getNumbers(),
+                savedNumbers.getDate()
         );
     }
 

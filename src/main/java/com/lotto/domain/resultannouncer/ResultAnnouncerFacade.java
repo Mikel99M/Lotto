@@ -27,20 +27,20 @@ public class ResultAnnouncerFacade {
         try {
             ticketDto = numberReceiverFacade.fetchTicketByHash(ticketHash);
         } catch (TicketNotFoundException e) {
-            return response(null, false, ResponseMesseges.NO_TICKET_WITH_THIS_HASH_FOUND.info);
+            return response(null, false, ResponseMessages.NO_TICKET_WITH_THIS_HASH_FOUND.info);
         }
 
         if (isBeforeDrawDate(ticketDto.drawDate())) {
-            return response(ticketDto, false, ResponseMesseges.IT_IS_BEFORE_DRAW_DATE.info);
+            return response(ticketDto, false, ResponseMessages.IT_IS_BEFORE_DRAW_DATE.info);
         }
 
         Optional<TicketDto> winningTicket = resultCheckerFacade.findWinningTicketByHash(ticketHash);
 
         if (winningTicket.isPresent()) {
-            return response(winningTicket.get(), true, ResponseMesseges.TICKET_HAS_WON.info);
+            return response(winningTicket.get(), true, ResponseMessages.TICKET_HAS_WON.info);
         }
 
-        return response(ticketDto, false, ResponseMesseges.TICKET_HAS_LOST.info);
+        return response(ticketDto, false, ResponseMessages.TICKET_HAS_LOST.info);
     }
 
     private boolean isBeforeDrawDate(LocalDateTime drawDate) {

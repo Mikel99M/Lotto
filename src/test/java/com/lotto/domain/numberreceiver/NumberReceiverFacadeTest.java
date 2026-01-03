@@ -3,11 +3,11 @@ package com.lotto.domain.numberreceiver;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.stub.HashGeneratorStub;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -19,19 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class NumberReceiverFacadeTest {
 
-    private TicketRepository ticketRepository;
-    private NumberReceiverFacade facade;
-    private HashGeneratorStub hashGenerator;
-    private Clock clock;
-    private NumberReceiverConfiguration numberReceiverConfiguration = new NumberReceiverConfiguration();
+    private final TicketRepository ticketRepository = new TicketRepositoryImplementation();
+    private final HashGeneratorStub hashGenerator = new HashGeneratorStub();
+    private Clock clock = Clock.systemUTC();
 
-    @BeforeEach
-    void setup() {
-        hashGenerator = new HashGeneratorStub();
-        ticketRepository = new TicketRepositoryImplementation();
-        clock = Clock.systemUTC();
-        facade = numberReceiverConfiguration.generateForTests(clock, ticketRepository, hashGenerator);
-    }
+    private final NumberReceiverFacade facade = new NumberReceiverFacadeConfiguration()
+            .create(ticketRepository, clock, hashGenerator);
 
     @Test
     public void should_return_correct_response_when_user_input_six_numbers_in_range() {
@@ -144,7 +137,8 @@ public class NumberReceiverFacadeTest {
         // given
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5, 6);
         clock = Clock.fixed(LocalDateTime.of(2025, 11, 8, 11, 5, 40).toInstant(ZoneOffset.UTC), ZoneId.of("Europe/London"));
-        NumberReceiverFacade facade = numberReceiverConfiguration.generateForTests(clock, ticketRepository, hashGenerator);
+        NumberReceiverFacade facade = new NumberReceiverFacadeConfiguration()
+                .create(ticketRepository, clock, hashGenerator);
 
         LocalDateTime now = LocalDateTime.now(clock);
         LocalDateTime nextSaturday = now.with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
@@ -166,7 +160,8 @@ public class NumberReceiverFacadeTest {
         // given
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5, 6);
         clock = Clock.fixed(LocalDateTime.of(2025, 11, 8, 20, 5, 10).toInstant(ZoneOffset.UTC), ZoneId.of("Europe/London"));
-        NumberReceiverFacade facade = numberReceiverConfiguration.generateForTests(clock, ticketRepository, hashGenerator);
+        NumberReceiverFacade facade = new NumberReceiverFacadeConfiguration()
+                .create(ticketRepository, clock, hashGenerator);
 
         LocalDateTime now = LocalDateTime.now(clock);
         LocalDateTime nextSaturday = now.with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
@@ -189,7 +184,8 @@ public class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5, 6);
 
         clock = Clock.fixed(LocalDateTime.of(2025, 11, 13, 10, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.of("Europe/London"));
-        NumberReceiverFacade facade = numberReceiverConfiguration.generateForTests(clock, ticketRepository, hashGenerator);
+        NumberReceiverFacade facade = new NumberReceiverFacadeConfiguration()
+                .create(ticketRepository, clock, hashGenerator);
 
         LocalDateTime drawDate = (LocalDateTime.of(2025, 11, 15, 20, 0, 0));
 
@@ -225,7 +221,8 @@ public class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5, 6);
 
         clock = Clock.fixed(LocalDateTime.of(2025, 11, 13, 10, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.of("Europe/London"));
-        NumberReceiverFacade facade = numberReceiverConfiguration.generateForTests(clock, ticketRepository, hashGenerator);
+        NumberReceiverFacade facade = new NumberReceiverFacadeConfiguration()
+                .create(ticketRepository, clock, hashGenerator);
 
         LocalDateTime drawDate = (LocalDateTime.of(2025, 11, 16, 20, 0, 0));
 

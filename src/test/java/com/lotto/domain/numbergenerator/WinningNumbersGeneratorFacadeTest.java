@@ -18,7 +18,7 @@ class WinningNumbersGeneratorFacadeTest {
     DrawDateGeneratorStub drawDateGeneratorStub = new DrawDateGeneratorStub();
 
     WinningNumbersGeneratorFacade facade =
-            new WinningNumbersConfiguration().createForTest(repository, numbersGeneratorStub, drawDateGeneratorStub);
+            new WinningNumbersGeneratorFacadeConfiguration().createForTest(repository, numbersGeneratorStub, drawDateGeneratorStub);
 
     LocalDateTime currentDateTime = LocalDateTime.of(2025, 11, 9, 0, 0);
 

@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AllArgsConstructor
 class ResultCheckerFacadeTest {
 
-    private final ResultCheckerConfiguration resultCheckerConfiguration = new ResultCheckerConfiguration();
+    private final ResultCheckerFacadeConfiguration resultCheckerConfiguration = new ResultCheckerFacadeConfiguration();
 
     @Test
     public void should_return_correct_ResultDto_with_empty_list_when_there_are_no_tickets_at_all() {

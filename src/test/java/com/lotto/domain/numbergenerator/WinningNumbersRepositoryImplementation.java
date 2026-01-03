@@ -30,7 +30,7 @@ class WinningNumbersRepositoryImplementation implements WinningNumbersRepository
     @Override
     public Optional<WinningNumbers> findByDate(final LocalDateTime drawDate) {
         return winningNumbersList.stream()
-                .filter(w -> w.date.isEqual(drawDate))
+                .filter(w -> w.getDate().isEqual(drawDate))
                 .findFirst();
     }
 

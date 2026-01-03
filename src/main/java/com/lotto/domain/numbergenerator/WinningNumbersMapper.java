@@ -9,8 +9,8 @@ class WinningNumbersMapper {
     List<WinningNumbersDto> mapWinningNumbersListToWinningNumbersDtoList(final List<WinningNumbers> winningNumbers) {
         return winningNumbers.stream()
                 .map(nums -> new WinningNumbersDto(
-                        nums.numbers,
-                        nums.date
+                        nums.getNumbers(),
+                        nums.getDate()
                 ))
                 .toList();
     }
@@ -18,8 +18,8 @@ class WinningNumbersMapper {
 
     WinningNumbersDto mapWinningNumbersToWinningNumbersDto(final WinningNumbers winningNumbers) {
         return new WinningNumbersDto(
-                winningNumbers.numbers,
-                winningNumbers.date
+                winningNumbers.getNumbers(),
+                winningNumbers.getDate()
         );
     }
 }
