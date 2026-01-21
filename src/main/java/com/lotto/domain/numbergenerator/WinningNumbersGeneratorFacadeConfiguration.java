@@ -17,15 +17,24 @@ public class WinningNumbersGeneratorFacadeConfiguration {
     }
 
     @Bean
+    DrawDateGenerator drawDateGenerator() {
+        return new DrawDateGenerator();
+    }
+
+    @Bean
+    WinningNumbersMapper winningNumbersMapper() {
+        return new WinningNumbersMapper();
+    }
+
+    @Bean
     WinningNumbersGeneratorFacade winningNumbersGeneratorFacade(
             WinningNumbersRepository repository,
             RandomNumberGenerable numbersGenerator,
             HashGenerable hashGenerator,
-            Clock clock,
-            WinningNumbersGeneratorFacadeConfigurationProperties properties) {
-
-        WinningNumbersMapper mapper = new WinningNumbersMapper();
-        DrawDateGenerator drawDateGenerator = new DrawDateGenerator();
+            DrawDateGenerator drawDateGenerator,
+            WinningNumbersMapper mapper,
+            WinningNumbersGeneratorFacadeConfigurationProperties properties,
+            Clock clock) {
 
         return new WinningNumbersGeneratorFacade(
                 repository,
@@ -33,14 +42,16 @@ public class WinningNumbersGeneratorFacadeConfiguration {
                 mapper,
                 hashGenerator,
                 drawDateGenerator,
-                properties
+                properties,
+                clock
         );
     }
 
     public WinningNumbersGeneratorFacade createForTest(
             WinningNumbersRepository repository,
             RandomNumberGenerable numbersGenerator,
-            DrawDateGenerator drawDateGenerator) {
+            DrawDateGenerator drawDateGenerator,
+            Clock clock) {
 
 
         WinningNumbersGeneratorFacadeConfigurationProperties properties = WinningNumbersGeneratorFacadeConfigurationProperties.builder()
@@ -54,7 +65,8 @@ public class WinningNumbersGeneratorFacadeConfiguration {
                 new WinningNumbersMapper(),
                 new HashGenerator(),
                 drawDateGenerator,
-                properties
+                properties,
+                clock
         );
     }
 }

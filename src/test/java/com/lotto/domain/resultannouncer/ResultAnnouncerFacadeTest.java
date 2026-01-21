@@ -4,6 +4,8 @@ import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.stub.NumberReceiverFacadeStub;
 import com.lotto.domain.stub.ResultCheckerFacadeStub;
+import com.lotto.domain.stub.WinningNumbersGeneratorFacadeStub;
+import com.lotto.domain.stub.WinningNumbersGeneratorFacadeStubForResultAnnouncer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +22,8 @@ public class ResultAnnouncerFacadeTest {
 
     ResultCheckerFacadeStub resultCheckerFacadeStub;
     NumberReceiverFacadeStub numberReceiverFacadeStub;
+    WinningNumbersGeneratorFacadeStubForResultAnnouncer winningNumbersGeneratorFacadeStub;
+
     Clock clock = Clock.systemUTC();
     Set<Integer> numbers = new HashSet<>(Set.of(1, 2, 3, 4, 5, 6));
 
@@ -29,14 +33,16 @@ public class ResultAnnouncerFacadeTest {
     public void setUp() {
         resultCheckerFacadeStub = new ResultCheckerFacadeStub();
         numberReceiverFacadeStub = new NumberReceiverFacadeStub();
+        winningNumbersGeneratorFacadeStub = new WinningNumbersGeneratorFacadeStubForResultAnnouncer();
+
         clock = Clock.fixed(LocalDateTime.of(2025, 11, 9, 12, 0).toInstant(ZoneOffset.UTC), ZoneId.of("Europe/London"));
-        resultAnnouncerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, clock);
+        resultAnnouncerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, winningNumbersGeneratorFacadeStub, clock);
     }
 
     @Test
     public void should_return_no_ticket_found_when_hash_does_not_exist() {
         // given
-        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, clock);
+        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, winningNumbersGeneratorFacadeStub, clock);
 
         // when
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("test_hash");
@@ -58,7 +64,7 @@ public class ResultAnnouncerFacadeTest {
                 .numbers(numbers)
                 .build();
         numberReceiverFacadeStub.addTicket(ticketBeforeDrawDate);
-        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, clock);
+        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, winningNumbersGeneratorFacadeStub, clock);
 
         // when
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("test_hash2");
@@ -81,7 +87,7 @@ public class ResultAnnouncerFacadeTest {
                 .build();
         numberReceiverFacadeStub.addTicket(winningTicket);
         resultCheckerFacadeStub.addTicketsThatWon(winningTicket);
-        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, clock);
+        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, winningNumbersGeneratorFacadeStub, clock);
 
         // when
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("test_hash3");
@@ -111,7 +117,7 @@ public class ResultAnnouncerFacadeTest {
                 .build();
         resultCheckerFacadeStub.addTicketsThatWon(winningTicket);
 
-        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, clock);
+        ResultAnnouncerFacade resultCheckerFacade = new ResultAnnouncerFacade(resultCheckerFacadeStub, numberReceiverFacadeStub, winningNumbersGeneratorFacadeStub, clock);
 
         // when
         ResultAnnouncerResponseDto result = resultCheckerFacade.checkResult("loosing_hash");
@@ -132,6 +138,11 @@ public class ResultAnnouncerFacadeTest {
         numberReceiverFacadeStub.addTicket(winningTicket);
         resultCheckerFacadeStub.addTicketsThatWon(winningTicket);
 
+        winningNumbersGeneratorFacadeStub.addWinningNumbers(
+                LocalDateTime.of(2025, 11, 8, 20, 0),
+                numbers
+        );
+
         // when
         ResultAnnouncerResponseDto result = resultAnnouncerFacade.checkResult("test_hash5");
 
@@ -140,6 +151,7 @@ public class ResultAnnouncerFacadeTest {
         assertThat(result.response().hash()).isEqualTo("test_hash5");
         assertThat(result.response().drawDate()).isEqualTo(LocalDateTime.of(2025, 11, 8, 20, 0));
         assertThat(result.response().numbers()).isEqualTo(numbers);
+        assertThat(result.response().winningNumbers()).isEqualTo(numbers);
         assertThat(result.response().isWon()).isTrue();
     }
 

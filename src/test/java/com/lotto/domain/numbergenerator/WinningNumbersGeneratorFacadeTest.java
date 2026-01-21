@@ -5,6 +5,7 @@ import com.lotto.domain.stub.DrawDateGeneratorStub;
 import com.lotto.domain.stub.NumbersGeneratorStub;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -16,9 +17,10 @@ class WinningNumbersGeneratorFacadeTest {
     WinningNumbersRepositoryImplementation repository = new WinningNumbersRepositoryImplementation();
     NumbersGeneratorStub numbersGeneratorStub = new NumbersGeneratorStub();
     DrawDateGeneratorStub drawDateGeneratorStub = new DrawDateGeneratorStub();
+    Clock clock = Clock.systemUTC();
 
     WinningNumbersGeneratorFacade facade =
-            new WinningNumbersGeneratorFacadeConfiguration().createForTest(repository, numbersGeneratorStub, drawDateGeneratorStub);
+            new WinningNumbersGeneratorFacadeConfiguration().createForTest(repository, numbersGeneratorStub, drawDateGeneratorStub, clock);
 
     LocalDateTime currentDateTime = LocalDateTime.of(2025, 11, 9, 0, 0);
 

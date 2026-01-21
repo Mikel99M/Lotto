@@ -27,10 +27,11 @@ public class NumberReceiverFacade implements NumberReceiver {
         if (areAllNumbersInRange) {
             String hash = generateHash();
             LocalDateTime drawDate = generateNextDrawDate(now);
-            Ticket save = repository.save(new Ticket(hash, drawDate, numbersFromUser));
+            Ticket save = repository.save(new Ticket(hash, now, drawDate, numbersFromUser));
 
             return InputNumberResultDto.builder()
                     .message("success")
+                    .operationDate(now)
                     .drawDate(save.drawDate())
                     .hash(save.hash())
                     .numbersFromUser(save.numbersFromUser())
@@ -38,6 +39,7 @@ public class NumberReceiverFacade implements NumberReceiver {
         }
         return InputNumberResultDto.builder()
                 .message("failed")
+                .operationDate(now)
                 .build();
     }
 
@@ -60,13 +62,14 @@ public class NumberReceiverFacade implements NumberReceiver {
 
         return TicketDto.builder()
                 .numbers(ticket.numbersFromUser())
+                .purchaseDate(ticket.purchaseDate())
                 .drawDate(ticket.drawDate())
                 .hash(ticket.hash())
                 .build();
     }
 
-    public LocalDateTime generateNextDrawDate(LocalDateTime now) {
-        return drawDateGenerator.generateNextDrawDate(now);
+    public LocalDateTime generateNextDrawDate(LocalDateTime NOW) {
+        return drawDateGenerator.generateNextDrawDate(NOW);
     }
 
     public String generateHash() {

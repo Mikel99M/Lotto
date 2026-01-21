@@ -8,6 +8,7 @@ import java.util.Set;
 @Builder
 public record TicketDto(
         String hash,
+        LocalDateTime purchaseDate,
         LocalDateTime drawDate,
         Set<Integer> numbers
 ) {

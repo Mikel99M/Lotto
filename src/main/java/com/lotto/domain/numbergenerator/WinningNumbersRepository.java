@@ -14,5 +14,5 @@ public interface WinningNumbersRepository extends MongoRepository<WinningNumbers
 
     List<WinningNumbers> findAll();
 
-    Optional<WinningNumbers> findByDate(LocalDateTime drawDate);
+    Optional<WinningNumbers> findWinningNumbersByDate(LocalDateTime drawDate);
 }

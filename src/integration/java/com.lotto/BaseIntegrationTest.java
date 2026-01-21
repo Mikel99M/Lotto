@@ -16,7 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
-@SpringBootTest(classes = LottoApplication.class)
+@SpringBootTest(classes = {LottoApplication.class, IntegrationConfiguration.class}, properties = "spring.task.scheduling.enabled: false")
 @ActiveProfiles({"integration"})
 @AutoConfigureMockMvc
 @Testcontainers

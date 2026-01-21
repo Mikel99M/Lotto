@@ -6,6 +6,7 @@ import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import lombok.AllArgsConstructor;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -19,9 +20,11 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     private final HashGenerable hashGenerator;
     private final DrawDateGenerator drawDateGenerator;
     private final WinningNumbersGeneratorFacadeConfigurationProperties properties;
+    private final Clock clock;
 
     public WinningNumbersDto generate() {
-        LocalDateTime drawDate = drawDateGenerator.generateNextDrawDate(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now(clock);
+        LocalDateTime drawDate = drawDateGenerator.generateNextDrawDate(now);
         String hash = hashGenerator.generateHash();
         SixRandomNumbersDto dto = numbersGenerator.generateSixRandomNumbers(properties.lowerBand(), properties.upperBand());
         Set<Integer> winningNums = dto.numbers();
@@ -33,8 +36,8 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
                 .build();
         WinningNumbers savedNumbers = winningNumbersRepository.save(winningNumbers);
         return new WinningNumbersDto(
-                savedNumbers.getNumbers(),
-                savedNumbers.getDate()
+                savedNumbers.numbers(),
+                savedNumbers.date()
         );
     }
 
@@ -44,7 +47,7 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     }
 
     public WinningNumbersDto retrieveWinningNumbersDtoByDraw(LocalDateTime drawDate) {
-        WinningNumbers winningNumbers = winningNumbersRepository.findByDate(drawDate).orElseThrow(
+        WinningNumbers winningNumbers = winningNumbersRepository.findWinningNumbersByDate(drawDate).orElseThrow(
                 () -> new WinningNumbersNotFoundException("No winning numbers found for draw date: " + drawDate)
         );
         return winningNumbersMapper.mapWinningNumbersToWinningNumbersDto(winningNumbers);

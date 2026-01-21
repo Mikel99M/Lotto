@@ -1,0 +1,7 @@
+lotto:
+  number-generator:
+    lotteryRunOccurrence: "*/10 * * * * *"
+spring:
+  task:
+    scheduling:
+      enabled: false

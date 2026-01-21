@@ -1,0 +1,16 @@
+package com.lotto.domain.general;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.time.Clock;
+
+@Configuration
+public class GeneralConfig {
+
+    @Bean
+    Clock clock() {
+        return Clock.systemUTC();
+    }
+
+}

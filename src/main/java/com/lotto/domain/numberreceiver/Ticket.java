@@ -5,6 +5,7 @@ import java.util.Set;
 
 record Ticket(
         String hash,
+        LocalDateTime purchaseDate,
         LocalDateTime drawDate,
         Set<Integer> numbersFromUser) {
 }

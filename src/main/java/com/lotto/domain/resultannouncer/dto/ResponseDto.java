@@ -9,6 +9,7 @@ import java.util.Set;
 public record ResponseDto(
         String hash,
         Set<Integer> numbers,
+        Set<Integer> winningNumbers,
         LocalDateTime drawDate,
         boolean isWon
 ) {

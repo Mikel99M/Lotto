@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 @Component
-@Profile("!local")
+@Profile({"!local", "!test"})
 public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable {
 
     public static final int MAXIMAL_WINNING_NUMBERS = 6;
@@ -31,7 +31,7 @@ public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable 
     private static final int MAX_RETRIES = 10;
     private final RestTemplate restTemplate;
 
-    private final RandomNumberGeneratorProperties properties;
+    private final RandomGeneratorClientConfigProperties properties;
 
     @Override
     public SixRandomNumbersDto generateSixRandomNumbers(int lowerBand, int upperBand) {
@@ -78,6 +78,6 @@ public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable 
     }
 
     private String getUrlForService(String service) {
-        return properties.getUri() + ":" + properties.getPort() + service;
+        return properties.uri() + ":" + properties.port() + service;
     }
 }

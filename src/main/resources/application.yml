@@ -2,6 +2,14 @@ spring:
   data:
     mongodb:
       uri: mongodb://root:example@localhost:27017/lotto-web?authSource=admin
+  main:
+    allow-bean-definition-overriding: true
+  task:
+    scheduling:
+      enabled: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 lotto:
   number-generator:
@@ -15,6 +23,7 @@ lotto:
           port: 80
         connectionTimeout: 2000
         readTimeout: 2000
+    lotteryRunOccurrence: "*/10 * * * * *"
 
 
 

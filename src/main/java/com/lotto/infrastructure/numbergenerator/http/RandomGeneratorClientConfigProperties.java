@@ -7,6 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Builder
 public record RandomGeneratorClientConfigProperties(
         long connectionTimeout,
-        long readTimeout
+        long readTimeout,
+        String uri,
+        int port
 ) {
 }

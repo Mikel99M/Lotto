@@ -1,6 +1,8 @@
 package com.lotto.domain.resultannouncer;
 
 import com.lotto.domain.general.NumberReceiver;
+import com.lotto.domain.general.WinningNumbersGenerator;
+import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultannouncer.dto.ResponseDto;
@@ -18,6 +20,7 @@ public class ResultAnnouncerFacade {
 
     private final ResultChecker resultCheckerFacade;
     private final NumberReceiver numberReceiverFacade;
+    private final WinningNumbersGenerator WinningNumbersGeneratorFacade;
     private final Clock clock;
 
     public ResultAnnouncerResponseDto checkResult(String ticketHash) {
@@ -51,22 +54,31 @@ public class ResultAnnouncerFacade {
 
         String hash = null;
         Set<Integer> numbers = null;
+        Set<Integer> winningNumbers = Set.of();
         LocalDateTime drawDate = null;
 
         if (ticket != null) {
             hash = ticket.hash();
             numbers = ticket.numbers();
             drawDate = ticket.drawDate();
+            winningNumbers = getWinningNumbers(ticket);
+
         }
 
         ResponseDto dto = new ResponseDto(
                 hash,
                 numbers,
+                winningNumbers,
                 drawDate,
                 isWinner
         );
 
         return new ResultAnnouncerResponseDto(dto, message);
+    }
+
+    private Set<Integer> getWinningNumbers(TicketDto ticket) {
+        WinningNumbersDto result = WinningNumbersGeneratorFacade.retrieveWinningNumbersDtoByDraw(ticket.drawDate());
+        return result.winningNumbers();
     }
 
 }

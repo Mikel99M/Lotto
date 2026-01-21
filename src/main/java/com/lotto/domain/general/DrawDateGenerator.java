@@ -13,6 +13,8 @@ public class DrawDateGenerator {
 
     public LocalDateTime generateNextDrawDate(LocalDateTime now) {
 
+        LocalDateTime drawDate = now.with(DRAW_DAY);
+
         LocalDateTime nextDrawDate = now.with(TemporalAdjusters.next(DRAW_DAY));
 
         return nextDrawDate

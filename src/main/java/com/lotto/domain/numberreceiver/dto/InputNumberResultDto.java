@@ -8,6 +8,7 @@ import java.util.Set;
 @Builder
 public record InputNumberResultDto(
         String message,
+        LocalDateTime operationDate,
         LocalDateTime drawDate,
         String hash,
         Set<Integer> numbersFromUser
