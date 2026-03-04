@@ -1,11 +1,11 @@
 package com.lotto.domain.numberreceiver;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 record Ticket(
         String hash,
-        LocalDateTime purchaseDate,
-        LocalDateTime drawDate,
+        Instant purchaseDate,
+        Instant drawDate,
         Set<Integer> numbersFromUser) {
 }

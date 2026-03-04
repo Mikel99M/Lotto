@@ -1,31 +1,39 @@
 package com.lotto.domain.general;
 
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
+
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 
+@Component
+@AllArgsConstructor
 public class DrawDateGenerator {
 
     static final DayOfWeek DRAW_DAY = DayOfWeek.SATURDAY;
     static final int DRAW_HOUR = 20;
 
-    public LocalDateTime generateNextDrawDate(LocalDateTime now) {
+    private final ZoneId businessZone;
 
-        LocalDateTime drawDate = now.with(DRAW_DAY);
+    public Instant generateNextDrawDate(Instant nowIntant) {
 
-        LocalDateTime nextDrawDate = now.with(TemporalAdjusters.next(DRAW_DAY));
+        ZonedDateTime now = nowIntant.atZone(businessZone);
 
-        return nextDrawDate
+        ZonedDateTime nextDraw = now
+                .with(TemporalAdjusters.nextOrSame(DRAW_DAY))
                 .withHour(DRAW_HOUR)
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
-    }
 
-    public LocalDateTime convertToDateTime(final LocalDate drawDate) {
-        return LocalDateTime.of(drawDate, LocalTime.of(DRAW_HOUR, 0));
+        if (now.isAfter(nextDraw)) {
+            nextDraw = nextDraw.plusWeeks(1);
+        }
+
+        return nextDraw.toInstant();
     }
 
 }

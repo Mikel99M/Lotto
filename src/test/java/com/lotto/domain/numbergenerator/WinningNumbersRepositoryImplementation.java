@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +28,9 @@ class WinningNumbersRepositoryImplementation implements WinningNumbersRepository
     }
 
     @Override
-    public Optional<WinningNumbers> findWinningNumbersByDate(final LocalDateTime drawDate) {
+    public Optional<WinningNumbers> findWinningNumbersByDate(final Instant drawDate) {
         return winningNumbersList.stream()
-                .filter(w -> w.date().isEqual(drawDate))
+                .filter(w -> w.date().equals(drawDate))
                 .findFirst();
     }
 

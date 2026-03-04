@@ -1,7 +1,10 @@
 package com.lotto.domain.numberreceiver;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Set;
 
+@Component
 class NumberValidator {
 
     private static final int MINIMAL_NUMBERS_FROM_USER = 1;

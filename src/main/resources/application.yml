@@ -12,6 +12,8 @@ spring:
       matching-strategy: ant_path_matcher
 
 lotto:
+  time:
+    timeZone: "Europe/Warsaw"
   number-generator:
     facade:
       lowerBand: 1
@@ -23,7 +25,8 @@ lotto:
           port: 80
         connectionTimeout: 2000
         readTimeout: 2000
-    lotteryRunOccurrence: "*/10 * * * * *"
+    lotteryRunOccurrence: "0 0 20 * * */6"
+#    lotteryRunOccurrence: "*/15 * * * * *"
 
 
 

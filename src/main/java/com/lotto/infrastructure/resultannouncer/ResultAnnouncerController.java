@@ -1,5 +1,8 @@
 package com.lotto.infrastructure.resultannouncer;
 
+import com.lotto.domain.numbergenerator.WinningNumbersGeneratorFacade;
+import com.lotto.domain.numbergenerator.WinningNumbersRepository;
+import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import com.lotto.domain.resultannouncer.ResultAnnouncerFacade;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import lombok.AllArgsConstructor;
@@ -15,10 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResultAnnouncerController {
 
     private final ResultAnnouncerFacade facade;
+    private final WinningNumbersGeneratorFacade generatorFacade;
+    private final WinningNumbersRepository winningNumbersRepository;
 
-    @GetMapping("/results/{hash}")
+    @GetMapping("/result/{hash}")
     public ResponseEntity<ResultAnnouncerResponseDto> checkResult(@PathVariable String hash) {
         ResultAnnouncerResponseDto result = facade.checkResult(hash);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/result/recent")
+    public ResponseEntity<WinningNumbersDto> getResult() {
+        WinningNumbersDto result = generatorFacade.retrieveMostRecentWinningNumbersDto();
         return ResponseEntity.ok(result);
     }
 

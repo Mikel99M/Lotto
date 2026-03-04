@@ -1,42 +1,42 @@
 package com.lotto.domain.resultchecker;
 
-import com.lotto.domain.general.DrawDateGenerator;
 import com.lotto.domain.general.NumberReceiver;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
+import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultchecker.dto.ResultDto;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Component
 @AllArgsConstructor
 public class ResultCheckerFacade implements ResultChecker {
 
     private final WinningNumbersGenerator winningNumbersGenerator;
     private final NumberReceiver numberReceiver;
-    private final DrawDateGenerator drawDateGenerator;
 
-    public ResultDto checkResult(LocalDate drawDate) {
-
-        LocalDateTime exactDrawDate = drawDateGenerator.convertToDateTime(drawDate);
+    public ResultDto checkResult(Instant drawDate) {
 
         return ResultDto.builder()
-                .drawDate(exactDrawDate)
+                .drawDate(drawDate)
                 .winningTickets(retrieveWinningTickets(drawDate))
                 .build();
     }
 
-    public List<TicketDto> retrieveWinningTickets(LocalDate drawDate) {
+    public List<TicketDto> retrieveWinningTickets(Instant drawDateInstant) {
         Optional<WinningNumbersDto> winningNumbersDto = winningNumbersGenerator
                 .retrieveAllWinningNumbersDtos()
                 .stream()
-                .filter(dto -> dto.date().toLocalDate().isEqual(drawDate))
+                .filter(dto -> dto.date().equals(drawDateInstant))
                 .findFirst();
 
         if (winningNumbersDto.isEmpty()) {
@@ -45,27 +45,29 @@ public class ResultCheckerFacade implements ResultChecker {
 
         Set<Integer> winningNumbers = winningNumbersDto.get().winningNumbers();
 
-        LocalDateTime exactDrawDate = drawDateGenerator.convertToDateTime(drawDate);
-
-        return numberReceiver.fetchAllTicketDtos(exactDrawDate)
+        return numberReceiver.fetchAllTicketDtos(drawDateInstant)
                 .stream()
                 .filter(ticket -> ticket.numbers().equals(winningNumbers))
                 .toList();
     }
 
     public Optional<TicketDto> findWinningTicketByHash(String hash) {
+        try {
         TicketDto ticketDto = numberReceiver.fetchTicketByHash(hash);
-
-        LocalDate drawDate = ticketDto.drawDate().toLocalDate();
-        List<TicketDto> winningTickets = retrieveWinningTickets(drawDate);
+        Instant drawDateTime = ticketDto.drawDate();
+        List<TicketDto> winningTickets = retrieveWinningTickets(drawDateTime);
 
         return winningTickets.stream()
                 .filter(winningTicket -> winningTicket.hash().equals(hash))
                 .findFirst();
+        } catch (TicketNotFoundException e) {
+            return Optional.empty();
+        }
     }
 
     public boolean thereIsWinningTicket(LocalDate drawDate) {
-        return !retrieveWinningTickets(drawDate).isEmpty();
+        Instant drawDateInstant = drawDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+        return !retrieveWinningTickets(drawDateInstant).isEmpty();
     }
 
 

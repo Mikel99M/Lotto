@@ -5,7 +5,7 @@ import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,9 +19,9 @@ public class NumberReceiverFacadeStub implements NumberReceiver {
     }
 
     @Override
-    public List<TicketDto> fetchAllTicketDtos(LocalDateTime date) {
+    public List<TicketDto> fetchAllTicketDtos(Instant date) {
         return tickets.stream()
-                .filter(t -> t.drawDate().isEqual(date))
+                .filter(t -> t.drawDate().equals(date))
                 .toList();
     }
 
@@ -31,7 +31,7 @@ public class NumberReceiverFacadeStub implements NumberReceiver {
     }
 
     @Override
-    public LocalDateTime generateNextDrawDate(LocalDateTime now) {
+    public Instant generateNextDrawDate(Instant now) {
         return null;
     }
 

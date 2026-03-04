@@ -3,7 +3,7 @@ package com.lotto.domain.stub;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +11,9 @@ import java.util.Set;
 
 public class WinningNumbersGeneratorFacadeStubForResultAnnouncer implements WinningNumbersGenerator {
 
-    private final Map<LocalDateTime, Set<Integer>> winningNumbersByDraw = new HashMap<>();
+    private final Map<Instant, Set<Integer>> winningNumbersByDraw = new HashMap<>();
 
-    public void addWinningNumbers(LocalDateTime drawDate, Set<Integer> numbers) {
+    public void addWinningNumbers(Instant drawDate, Set<Integer> numbers) {
         winningNumbersByDraw.put(drawDate, numbers);
     }
 
@@ -28,7 +28,7 @@ public class WinningNumbersGeneratorFacadeStubForResultAnnouncer implements Winn
     }
 
     @Override
-    public WinningNumbersDto retrieveWinningNumbersDtoByDraw(LocalDateTime drawDate) {
+    public WinningNumbersDto retrieveWinningNumbersDtoByDraw(Instant drawDate) {
         return new WinningNumbersDto(
                 winningNumbersByDraw.getOrDefault(drawDate, Set.of()),
                 drawDate

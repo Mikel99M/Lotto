@@ -2,7 +2,7 @@ package com.lotto.domain.general;
 
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 public interface WinningNumbersGenerator {
@@ -11,5 +11,5 @@ public interface WinningNumbersGenerator {
 
     List<WinningNumbersDto> retrieveAllWinningNumbersDtos();
 
-    WinningNumbersDto retrieveWinningNumbersDtoByDraw(LocalDateTime drawDate);
+    WinningNumbersDto retrieveWinningNumbersDtoByDraw(Instant drawDate);
 }

@@ -4,6 +4,7 @@ import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultchecker.ResultChecker;
 import com.lotto.domain.resultchecker.dto.ResultDto;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +19,12 @@ public class ResultCheckerFacadeStub implements ResultChecker {
     }
 
     @Override
-    public ResultDto checkResult(final LocalDate drawDate) {
+    public ResultDto checkResult(final Instant drawDate) {
         return null;
     }
 
     @Override
-    public List<TicketDto> retrieveWinningTickets(final LocalDate drawDate) {
+    public List<TicketDto> retrieveWinningTickets(final Instant drawDate) {
         return List.of();
     }
 

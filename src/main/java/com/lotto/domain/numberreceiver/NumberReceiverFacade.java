@@ -6,40 +6,44 @@ import com.lotto.domain.general.NumberReceiver;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
+@Service
 public class NumberReceiverFacade implements NumberReceiver {
 
     private final NumberValidator numberValidator;
     private final TicketRepository repository;
-    private final Clock clock;
     private final HashGenerable hashGenerator;
     private final DrawDateGenerator drawDateGenerator;
+    private final Clock clock;
+    private final ZoneId businessZone;
 
     public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser) {
         boolean areAllNumbersInRange = areNumbersCorrectAndInRange(numbersFromUser);
-        LocalDateTime now = LocalDateTime.now(clock);
+        Instant now = Instant.now(clock);
         if (areAllNumbersInRange) {
             String hash = generateHash();
-            LocalDateTime drawDate = generateNextDrawDate(now);
+            Instant drawDate = generateNextDrawDate(now);
             Ticket save = repository.save(new Ticket(hash, now, drawDate, numbersFromUser));
 
             return InputNumberResultDto.builder()
                     .message("success")
-                    .operationDate(now)
-                    .drawDate(save.drawDate())
+                    .operationDate(now.atZone(businessZone))
+                    .drawDate(save.drawDate().atZone(businessZone))
                     .hash(save.hash())
                     .numbersFromUser(save.numbersFromUser())
                     .build();
         }
         return InputNumberResultDto.builder()
                 .message("failed")
-                .operationDate(now)
+                .operationDate(now.atZone(businessZone))
                 .build();
     }
 
@@ -47,7 +51,7 @@ public class NumberReceiverFacade implements NumberReceiver {
         return numberValidator.areNumbersCorrectAndInRange(numbersFromUser);
     }
 
-    public List<TicketDto> fetchAllTicketDtos(LocalDateTime date) {
+    public List<TicketDto> fetchAllTicketDtos(Instant date) {
         List<Ticket> allTicketsByDrawDate = repository.findAllTicketsByDrawDate(date);
         return allTicketsByDrawDate
                 .stream()
@@ -68,7 +72,7 @@ public class NumberReceiverFacade implements NumberReceiver {
                 .build();
     }
 
-    public LocalDateTime generateNextDrawDate(LocalDateTime NOW) {
+    public Instant generateNextDrawDate(Instant NOW) {
         return drawDateGenerator.generateNextDrawDate(NOW);
     }
 

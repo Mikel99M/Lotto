@@ -4,7 +4,7 @@ import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class WinningNumbersGeneratorFacadeStub implements WinningNumbersGenerato
     }
 
     @Override
-    public WinningNumbersDto retrieveWinningNumbersDtoByDraw(LocalDateTime drawDate) {
+    public WinningNumbersDto retrieveWinningNumbersDtoByDraw(Instant drawDate) {
         return list.stream()
                 .filter(dto -> dto.date().equals(drawDate))
                 .findFirst()

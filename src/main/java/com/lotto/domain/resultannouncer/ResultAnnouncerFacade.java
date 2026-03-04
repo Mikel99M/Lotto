@@ -2,6 +2,7 @@ package com.lotto.domain.resultannouncer;
 
 import com.lotto.domain.general.NumberReceiver;
 import com.lotto.domain.general.WinningNumbersGenerator;
+import com.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
@@ -11,7 +12,7 @@ import com.lotto.domain.resultchecker.ResultChecker;
 import lombok.AllArgsConstructor;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -39,15 +40,12 @@ public class ResultAnnouncerFacade {
 
         Optional<TicketDto> winningTicket = resultCheckerFacade.findWinningTicketByHash(ticketHash);
 
-        if (winningTicket.isPresent()) {
-            return response(winningTicket.get(), true, ResponseMessages.TICKET_HAS_WON.info);
-        }
+        return winningTicket.map(dto -> response(dto, true, ResponseMessages.TICKET_HAS_WON.info)).orElseGet(() -> response(ticketDto, false, ResponseMessages.TICKET_HAS_LOST.info));
 
-        return response(ticketDto, false, ResponseMessages.TICKET_HAS_LOST.info);
     }
 
-    private boolean isBeforeDrawDate(LocalDateTime drawDate) {
-        return LocalDateTime.now(clock).isBefore(drawDate);
+    private boolean isBeforeDrawDate(Instant drawDate) {
+        return Instant.now(clock).isBefore(drawDate);
     }
 
     private ResultAnnouncerResponseDto response(TicketDto ticket, boolean isWinner, String message) {
@@ -55,7 +53,7 @@ public class ResultAnnouncerFacade {
         String hash = null;
         Set<Integer> numbers = null;
         Set<Integer> winningNumbers = Set.of();
-        LocalDateTime drawDate = null;
+        Instant drawDate = null;
 
         if (ticket != null) {
             hash = ticket.hash();
@@ -77,8 +75,12 @@ public class ResultAnnouncerFacade {
     }
 
     private Set<Integer> getWinningNumbers(TicketDto ticket) {
-        WinningNumbersDto result = WinningNumbersGeneratorFacade.retrieveWinningNumbersDtoByDraw(ticket.drawDate());
-        return result.winningNumbers();
+        try {
+            WinningNumbersDto result = WinningNumbersGeneratorFacade.retrieveWinningNumbersDtoByDraw(ticket.drawDate());
+            return result.winningNumbers();
+        } catch (WinningNumbersNotFoundException e) {
+            return Set.of();
+        }
     }
 
 }

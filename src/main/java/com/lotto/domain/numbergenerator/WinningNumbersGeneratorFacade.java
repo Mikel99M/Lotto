@@ -5,13 +5,17 @@ import com.lotto.domain.general.HashGenerable;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
+@Service
 public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
 
     private final WinningNumbersRepository winningNumbersRepository;
@@ -21,10 +25,11 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     private final DrawDateGenerator drawDateGenerator;
     private final WinningNumbersGeneratorFacadeConfigurationProperties properties;
     private final Clock clock;
+    private final ZoneId businessZone;
 
     public WinningNumbersDto generate() {
-        LocalDateTime now = LocalDateTime.now(clock);
-        LocalDateTime drawDate = drawDateGenerator.generateNextDrawDate(now);
+        ZonedDateTime now = clock.instant().atZone(businessZone);
+        Instant drawDate = drawDateGenerator.generateNextDrawDate(now.toInstant());
         String hash = hashGenerator.generateHash();
         SixRandomNumbersDto dto = numbersGenerator.generateSixRandomNumbers(properties.lowerBand(), properties.upperBand());
         Set<Integer> winningNums = dto.numbers();
@@ -46,11 +51,19 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
         return winningNumbersMapper.mapWinningNumbersListToWinningNumbersDtoList(winningNumbersList);
     }
 
-    public WinningNumbersDto retrieveWinningNumbersDtoByDraw(LocalDateTime drawDate) {
+    public WinningNumbersDto retrieveWinningNumbersDtoByDraw(Instant drawDate) {
         WinningNumbers winningNumbers = winningNumbersRepository.findWinningNumbersByDate(drawDate).orElseThrow(
                 () -> new WinningNumbersNotFoundException("No winning numbers found for draw date: " + drawDate)
         );
         return winningNumbersMapper.mapWinningNumbersToWinningNumbersDto(winningNumbers);
+    }
+
+    public WinningNumbersDto retrieveMostRecentWinningNumbersDto() {
+        ZonedDateTime now = clock.instant().atZone(businessZone);
+        ZonedDateTime previousWeekDate = now.minusWeeks(1);
+        Instant drawDate = drawDateGenerator.generateNextDrawDate(previousWeekDate.toInstant());
+
+        return retrieveWinningNumbersDtoByDraw(drawDate);
     }
 
 }

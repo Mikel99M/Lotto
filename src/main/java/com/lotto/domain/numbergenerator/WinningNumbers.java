@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 @Builder
@@ -14,6 +14,6 @@ public record WinningNumbers(
         @Id String id,
         @Indexed(unique = true) String hash,
         Set<Integer> numbers,
-        LocalDateTime date) {
+        Instant date) {
 
 }

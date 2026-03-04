@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +24,9 @@ class TicketRepositoryImplementation implements TicketRepository {
     }
 
     @Override
-    public List<Ticket> findAllTicketsByDrawDate(final LocalDateTime drawDate) {
+    public List<Ticket> findAllTicketsByDrawDate(final Instant drawDate) {
         return tickets.values().stream()
-                .filter(ticket -> ticket.drawDate().isEqual(drawDate))
+                .filter(ticket -> ticket.drawDate().equals(drawDate))
                 .toList();
     }
 

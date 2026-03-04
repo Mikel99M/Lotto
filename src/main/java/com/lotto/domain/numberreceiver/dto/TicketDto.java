@@ -2,14 +2,14 @@ package com.lotto.domain.numberreceiver.dto;
 
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 @Builder
 public record TicketDto(
         String hash,
-        LocalDateTime purchaseDate,
-        LocalDateTime drawDate,
+        Instant purchaseDate,
+        Instant drawDate,
         Set<Integer> numbers
 ) {
 }
