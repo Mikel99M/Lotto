@@ -1,5 +1,7 @@
-package com.lotto.domain.numbergenerator;
+package com.lotto.domain.resultchecker;
 
+import com.lotto.domain.numbergenerator.WinningNumbers;
+import com.lotto.domain.numbergenerator.WinningNumbersRepository;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -15,7 +17,7 @@ import java.util.function.Function;
 
 class WinningNumbersRepositoryImplementation implements WinningNumbersRepository {
 
-    private final List<WinningNumbers> winningNumbersList = new ArrayList<>();
+    private List<WinningNumbers> winningNumbersList = new ArrayList<>();
 
     @Override
     public WinningNumbers save(final WinningNumbers winningNumbers) {
@@ -37,7 +39,12 @@ class WinningNumbersRepositoryImplementation implements WinningNumbersRepository
 
     @Override
     public Optional<WinningNumbersDto> findByDate(final Instant drawDateInstant) {
-        return Optional.empty();
+        Optional<WinningNumbersDto> winningNumberDto = winningNumbersList.stream()
+                .filter(w -> w.date().equals(drawDateInstant))
+                .findFirst()
+                .map(n -> WinningNumbersDto.builder().winningNumbers(n.numbers()).date(n.date()).build());
+
+        return winningNumberDto;
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.lotto.domain.resultchecker;
 
-import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
+import com.lotto.domain.numbergenerator.WinningNumbers;
+import com.lotto.domain.numbergenerator.WinningNumbersRepository;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultchecker.dto.ResultDto;
 import com.lotto.domain.stub.NumberReceiverFacadeStub;
-import com.lotto.domain.stub.WinningNumbersGeneratorFacadeStub;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
 
@@ -27,13 +27,12 @@ class ResultCheckerFacadeTest {
     private final Set<Integer> loosingNumbers1 = Set.of(1, 2, 3, 12, 5, 6);
     private final Set<Integer> loosingNumbers2 = Set.of(1, 9, 3, 4, 5, 8);
 
-
-    private final WinningNumbersGeneratorFacadeStub winningNumbersGeneratorFacadeStub = new WinningNumbersGeneratorFacadeStub();
     private final NumberReceiverFacadeStub numberReceiverFacadeStub = new NumberReceiverFacadeStub();
+    private final WinningNumbersRepository winningNumbersRepository = new WinningNumbersRepositoryImplementation();
 
     private final ResultCheckerFacade facade = new ResultCheckerFacade(
-            winningNumbersGeneratorFacadeStub,
-            numberReceiverFacadeStub
+            numberReceiverFacadeStub,
+            winningNumbersRepository
     );
 
     @Test
@@ -49,7 +48,10 @@ class ResultCheckerFacadeTest {
     @Test
     public void should_return_correct_ResultDto_with_only_one_TicketDto_when_there_is_only_one_TicketDto() {
         // given
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(new WinningNumbersDto(winningNumbers, drawDate));
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
+                .date(drawDate)
+                .build());
 
         // when
         TicketDto winningTicket = TicketDto.builder()
@@ -70,7 +72,10 @@ class ResultCheckerFacadeTest {
     @Test
     public void should_return_correct_ResultDto_with_only_one_TicketDto_when_there_are_many_TicketDtos() {
         // given
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(new WinningNumbersDto(winningNumbers, drawDate));
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
+                .date(drawDate)
+                .build());
 
         // when
         TicketDto winningTicket = TicketDto.builder()
@@ -106,7 +111,10 @@ class ResultCheckerFacadeTest {
     @Test
     public void should_return_correct_ResultDto_with_two_different_TicketDtos() {
         // given
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(new WinningNumbersDto(winningNumbers, drawDate));
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
+                .date(drawDate)
+                .build());
 
         // when
         TicketDto winningTicket1 = TicketDto.builder()
@@ -167,7 +175,10 @@ class ResultCheckerFacadeTest {
     @Test
     public void should_return_list_with_one_ticket_when_there_is_only_one_ticket_at_all() {
         // given
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(new WinningNumbersDto(winningNumbers, drawDate));
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
+                .date(drawDate)
+                .build());
 
         // when
         numberReceiverFacadeStub.addTicket(TicketDto.builder()
@@ -175,9 +186,9 @@ class ResultCheckerFacadeTest {
                 .numbers(winningNumbers)
                 .build());
 
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(WinningNumbersDto.builder()
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
                 .date(drawDate)
-                .winningNumbers(winningNumbers)
                 .build());
 
         List<TicketDto> list = facade.retrieveWinningTickets(drawDate);
@@ -190,7 +201,10 @@ class ResultCheckerFacadeTest {
     @Test
     public void should_return_list_with_one_ticket_when_there_is_only_one_ticket_that_won_out_of_many() {
         // given
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(new WinningNumbersDto(winningNumbers, drawDate));
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
+                .date(drawDate)
+                .build());
 
         // when
         TicketDto winningTicket = TicketDto.builder()
@@ -222,7 +236,10 @@ class ResultCheckerFacadeTest {
     @Test
     public void should_return_list_with_two_tickets_that_won() {
         // given
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(new WinningNumbersDto(winningNumbers, drawDate));
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
+                .date(drawDate)
+                .build());
 
         // when
         TicketDto winningTicket1 = TicketDto.builder()
@@ -263,7 +280,10 @@ class ResultCheckerFacadeTest {
     @Test
     public void findWinningTicketByHash_should_return_correct_TicketDto() {
         // given
-        winningNumbersGeneratorFacadeStub.addWinningNumbers(new WinningNumbersDto(winningNumbers, drawDate));
+        winningNumbersRepository.save(WinningNumbers.builder()
+                .numbers(winningNumbers)
+                .date(drawDate)
+                .build());
 
         numberReceiverFacadeStub.addTicket(
                 TicketDto.builder()

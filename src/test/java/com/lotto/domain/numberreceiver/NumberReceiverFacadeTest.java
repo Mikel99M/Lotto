@@ -18,7 +18,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class NumberReceiverFacadeTest {
+class NumberReceiverFacadeTest {
 
     private final TicketRepository ticketRepository = new TicketRepositoryImplementation();
     private final HashGeneratorStub hashGenerator = new HashGeneratorStub();

@@ -1,7 +1,7 @@
 package com.lotto.domain.resultchecker;
 
 import com.lotto.domain.general.NumberReceiver;
-import com.lotto.domain.general.WinningNumbersGenerator;
+import com.lotto.domain.numbergenerator.WinningNumbersRepository;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
@@ -21,8 +21,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class ResultCheckerFacade implements ResultChecker {
 
-    private final WinningNumbersGenerator winningNumbersGenerator;
     private final NumberReceiver numberReceiver;
+    private final WinningNumbersRepository numbersRepository;
 
     public ResultDto checkResult(Instant drawDate) {
 
@@ -33,11 +33,7 @@ public class ResultCheckerFacade implements ResultChecker {
     }
 
     public List<TicketDto> retrieveWinningTickets(Instant drawDateInstant) {
-        Optional<WinningNumbersDto> winningNumbersDto = winningNumbersGenerator
-                .retrieveAllWinningNumbersDtos()
-                .stream()
-                .filter(dto -> dto.date().equals(drawDateInstant))
-                .findFirst();
+        Optional<WinningNumbersDto> winningNumbersDto = numbersRepository.findByDate(drawDateInstant);
 
         if (winningNumbersDto.isEmpty()) {
             return Collections.emptyList();

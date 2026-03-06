@@ -17,7 +17,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ResultAnnouncerFacadeTest {
+class ResultAnnouncerFacadeTest {
 
     ResultCheckerFacadeStub resultCheckerFacadeStub;
     NumberReceiverFacadeStub numberReceiverFacadeStub;
