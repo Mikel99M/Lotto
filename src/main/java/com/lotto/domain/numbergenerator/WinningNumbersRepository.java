@@ -1,6 +1,5 @@
 package com.lotto.domain.numbergenerator;
 
-import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +15,5 @@ public interface WinningNumbersRepository extends MongoRepository<WinningNumbers
     List<WinningNumbers> findAll();
 
     Optional<WinningNumbers> findWinningNumbersByDate(Instant drawDate);
-
-    Optional<WinningNumbersDto> findByDate(Instant drawDateInstant);
 
 }

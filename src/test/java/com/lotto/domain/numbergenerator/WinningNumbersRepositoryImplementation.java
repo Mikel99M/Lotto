@@ -36,11 +36,6 @@ class WinningNumbersRepositoryImplementation implements WinningNumbersRepository
     }
 
     @Override
-    public Optional<WinningNumbersDto> findByDate(final Instant drawDateInstant) {
-        return Optional.empty();
-    }
-
-    @Override
     public <S extends WinningNumbers, R> R findBy(final Example<S> example, final Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
         return null;
     }

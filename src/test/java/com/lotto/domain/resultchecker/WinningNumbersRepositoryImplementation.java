@@ -2,7 +2,6 @@ package com.lotto.domain.resultchecker;
 
 import com.lotto.domain.numbergenerator.WinningNumbers;
 import com.lotto.domain.numbergenerator.WinningNumbersRepository;
-import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,16 +34,6 @@ class WinningNumbersRepositoryImplementation implements WinningNumbersRepository
         return winningNumbersList.stream()
                 .filter(w -> w.date().equals(drawDate))
                 .findFirst();
-    }
-
-    @Override
-    public Optional<WinningNumbersDto> findByDate(final Instant drawDateInstant) {
-        Optional<WinningNumbersDto> winningNumberDto = winningNumbersList.stream()
-                .filter(w -> w.date().equals(drawDateInstant))
-                .findFirst()
-                .map(n -> WinningNumbersDto.builder().winningNumbers(n.numbers()).date(n.date()).build());
-
-        return winningNumberDto;
     }
 
     @Override
