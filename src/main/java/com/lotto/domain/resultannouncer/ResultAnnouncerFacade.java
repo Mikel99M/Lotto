@@ -21,7 +21,7 @@ public class ResultAnnouncerFacade {
 
     private final ResultChecker resultCheckerFacade;
     private final NumberReceiver numberReceiverFacade;
-    private final WinningNumbersGenerator WinningNumbersGeneratorFacade;
+    private final WinningNumbersGenerator winningNumbersGeneratorFacade;
     private final Clock clock;
 
     public ResultAnnouncerResponseDto checkResult(String ticketHash) {
@@ -76,7 +76,7 @@ public class ResultAnnouncerFacade {
 
     private Set<Integer> getWinningNumbers(TicketDto ticket) {
         try {
-            WinningNumbersDto result = WinningNumbersGeneratorFacade.retrieveWinningNumbersDtoByDraw(ticket.drawDate());
+            WinningNumbersDto result = winningNumbersGeneratorFacade.retrieveWinningNumbersDtoByDraw(ticket.drawDate());
             return result.winningNumbers();
         } catch (WinningNumbersNotFoundException e) {
             return Set.of();

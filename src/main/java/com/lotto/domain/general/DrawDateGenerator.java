@@ -36,4 +36,18 @@ public class DrawDateGenerator {
         return nextDraw.toInstant();
     }
 
+    public Instant generatePreviousDrawDate(Instant nowIntant) {
+
+        ZonedDateTime now = nowIntant.atZone(businessZone);
+
+        ZonedDateTime nextDraw = now
+                .with(TemporalAdjusters.previousOrSame(DRAW_DAY))
+                .withHour(DRAW_HOUR)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+
+        return nextDraw.toInstant();
+    }
+
 }

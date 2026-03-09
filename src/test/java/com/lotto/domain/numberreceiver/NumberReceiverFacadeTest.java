@@ -232,7 +232,6 @@ class NumberReceiverFacadeTest {
         assertThat(result.numbersFromUser()).isEqualTo(numbers);
         assertThat(tickets.size()).isEqualTo(1);
         assertThat(tickets.get(0).drawDate()).isEqualTo(drawDate.toInstant());
-
     }
 
     @Test
@@ -279,7 +278,13 @@ class NumberReceiverFacadeTest {
     @Test
     public void fetchTicketByHash_should_return_correct_TickeDto() {
         // given
-        Ticket ticket = new Ticket("test hash", Instant.now(), Instant.now(), Set.of());
+        Ticket ticket = Ticket.builder()
+                .hash("test hash")
+                .purchaseDate(Instant.now())
+                .drawDate(Instant.now())
+                .numbersFromUser(Set.of())
+                .build();
+
         ticketRepository.save(ticket);
 
         // when
@@ -298,6 +303,5 @@ class NumberReceiverFacadeTest {
                 () -> facade.fetchTicketByHash("test hash")
         );
     }
-
 
 }

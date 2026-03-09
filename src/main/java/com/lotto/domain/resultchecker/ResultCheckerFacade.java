@@ -1,8 +1,8 @@
 package com.lotto.domain.resultchecker;
 
 import com.lotto.domain.general.NumberReceiver;
+import com.lotto.domain.numbergenerator.WinningNumbers;
 import com.lotto.domain.numbergenerator.WinningNumbersRepository;
-import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import com.lotto.domain.numberreceiver.TicketNotFoundException;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultchecker.dto.ResultDto;
@@ -32,18 +32,18 @@ public class ResultCheckerFacade implements ResultChecker {
                 .build();
     }
 
-    public List<TicketDto> retrieveWinningTickets(Instant drawDateInstant) {
-        Optional<WinningNumbersDto> winningNumbersDto = numbersRepository.findByDate(drawDateInstant);
+    public List<TicketDto> retrieveWinningTickets(Instant drawDate) {
+        Optional<WinningNumbers> winningNumbers = numbersRepository.findWinningNumbersByDate(drawDate);
 
-        if (winningNumbersDto.isEmpty()) {
+        if (winningNumbers.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Set<Integer> winningNumbers = winningNumbersDto.get().winningNumbers();
+        Set<Integer> sixWinningNumbers = winningNumbers.get().numbers();
 
-        return numberReceiver.fetchAllTicketDtos(drawDateInstant)
+        return numberReceiver.fetchAllTicketDtos(drawDate)
                 .stream()
-                .filter(ticket -> ticket.numbers().equals(winningNumbers))
+                .filter(ticket -> ticket.numbers().equals(sixWinningNumbers))
                 .toList();
     }
 
@@ -62,9 +62,8 @@ public class ResultCheckerFacade implements ResultChecker {
     }
 
     public boolean thereIsWinningTicket(LocalDate drawDate) {
-        Instant drawDateInstant = drawDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+        Instant drawDateInstant = drawDate.atStartOfDay().atZone(ZoneId.of("Europe/Warsaw")).toInstant();
         return !retrieveWinningTickets(drawDateInstant).isEmpty();
     }
-
 
 }

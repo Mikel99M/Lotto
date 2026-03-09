@@ -4,4 +4,4 @@ lotto:
 spring:
   task:
     scheduling:
-      enabled: false
+      enabled: true

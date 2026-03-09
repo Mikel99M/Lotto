@@ -31,7 +31,12 @@ public class NumberReceiverFacade implements NumberReceiver {
         if (areAllNumbersInRange) {
             String hash = generateHash();
             Instant drawDate = generateNextDrawDate(now);
-            Ticket save = repository.save(new Ticket(hash, now, drawDate, numbersFromUser));
+            Ticket save = repository.save(Ticket.builder()
+                    .hash(hash)
+                    .numbersFromUser(numbersFromUser)
+                    .drawDate(drawDate)
+                    .purchaseDate(now)
+                    .build());
 
             return InputNumberResultDto.builder()
                     .message("success")

@@ -33,5 +33,4 @@ public class ResultAnnouncerController {
         return ResponseEntity.ok(result);
     }
 
-
 }
