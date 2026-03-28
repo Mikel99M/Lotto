@@ -1,6 +1,13 @@
 lotto:
   number-generator:
     lotteryRunOccurrence: "*/10 * * * * *"
+    http:
+      client:
+        config:
+          uri: "http://localhost"
+          port: 80
+          connectionTimeout: 1000
+          readTimeout: 1000
 spring:
   task:
     scheduling:

@@ -23,8 +23,8 @@ lotto:
         config:
           uri: http://www.randomnumberapi.com
           port: 80
-        connectionTimeout: 2000
-        readTimeout: 2000
+          connectionTimeout: 2000
+          readTimeout: 2000
     lotteryRunOccurrence: "0 0 20 * * */6"
     checkingLotterryResultsOccurrence: "0 1 20 * * */6"
 

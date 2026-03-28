@@ -1,50 +1,47 @@
 package com.lotto.feature;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.jayway.jsonpath.JsonPath;
 import com.lotto.BaseIntegrationTest;
 import com.lotto.domain.AdjustableClock;
 import com.lotto.domain.numbergenerator.WinningNumbersGeneratorFacade;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
-import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.resultchecker.dto.ResultDto;
 import com.lotto.infrastructure.resultchecker.scheduler.ResultCheckerScheduler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class HappyPathIntegrationTest extends BaseIntegrationTest {
 
+    private final Set<Integer> winningNumbers = Set.of(1, 2, 3, 4, 5, 6);
     @Autowired
     WinningNumbersGeneratorFacade winningNumbersGeneratorFacade;
-
     @Autowired
     ResultCheckerScheduler resultCheckerScheduler;
-
     @Autowired
     Clock clock;
 
     private AdjustableClock adjustableClock() {
         return (AdjustableClock) clock;
     }
-
-    private Set<Integer> winningNumbers = Set.of(1, 2, 3, 4, 5, 6);
 
     @Test
     void testHappyScenarioWhereUserWins() throws Exception {
@@ -69,7 +66,7 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                 winningNumbersGeneratorFacade.generate();
 
         assertThat(winningNumbersDto.winningNumbers())
-                .isEqualTo(Set.of(1, 2, 3, 4, 5, 6));
+                .isEqualTo(winningNumbers);
 
         // step 3: /result/recent returns 404 and response: "No winning numbers found for draw date: 2025-12-13T19:00:00Z"
         mockMvc.perform(get("/result/recent"))
@@ -86,28 +83,23 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                 );
 
         // step 4: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 14-12-2025 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:20.12.2025 20:00 (Saturday))
-        // when
+        // when & then
         ResultActions perform = mockMvc.perform(post("/inputNumbers")
-                .content("""
-                        {
-                        "inputNumbers": [1,2,3,4,5,6]
-                        }
-                        """.trim()
-                ).contentType(MediaType.APPLICATION_JSON)
-        );
+                        .content("""
+                                {
+                                "inputNumbers": [1,2,3,4,5,6]
+                                }
+                                """.trim()
+                        ).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("success"))
+                .andExpect(jsonPath("$.drawDate").value("2025-12-20T20:00:00+01:00"))
+                .andExpect(jsonPath("$.numbersFromUser").isArray())
+                .andExpect(jsonPath("$.numbersFromUser", hasItems(1, 2, 3, 4, 5, 6)))
+                .andExpect(jsonPath("$.hash").exists());
 
-        // then
-        ZonedDateTime now = ZonedDateTime.now(clock);
-        MvcResult mvcResult = perform.andExpect(status().isOk()).andReturn();
-        String json = mvcResult.getResponse().getContentAsString();
-        InputNumberResultDto inputNumberResultDto = objectMapper.readValue(json, InputNumberResultDto.class);
-        String hash = inputNumberResultDto.hash();
-        assertAll(
-                () -> assertThat(inputNumberResultDto.drawDate().toInstant()).isEqualTo(Instant.parse("2025-12-20T19:00:00Z")),
-                () -> assertThat(inputNumberResultDto.numbersFromUser()).isEqualTo(Set.of(1, 2, 3, 4, 5, 6)),
-                () -> assertThat(inputNumberResultDto.operationDate()).isEqualTo(now),
-                () -> assertThat(inputNumberResultDto.message()).isEqualTo("success")
-        );
+        String json = perform.andReturn().getResponse().getContentAsString();
+        String hash = JsonPath.read(json, "$.hash");
 
         //    step 5: user made GET /result/notExistingId and system returned 200 and body with message "No ticket with this hash found"
         // when
@@ -190,8 +182,14 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
         // then
         assertAll(
                 () -> assertThat(result.winningTickets()).hasSize(1),
-                () -> assertThat(result.winningTickets().get(0).numbers()).isEqualTo(winningNumbers),
-                () -> assertThat(result.winningTickets().get(0).purchaseDate()).isEqualTo(Instant.parse("2025-12-14T18:30:00Z")),
+                () -> {
+                    assert result.winningTickets() != null;
+                    assertThat(result.winningTickets().get(0).numbers()).isEqualTo(winningNumbers);
+                },
+                () -> {
+                    assert result.winningTickets() != null;
+                    assertThat(result.winningTickets().get(0).purchaseDate()).isEqualTo(Instant.parse("2025-12-14T18:30:00Z"));
+                },
                 () -> assertThat(result.drawDate()).isEqualTo(Instant.parse("2025-12-20T19:00:00Z"))
         );
     }

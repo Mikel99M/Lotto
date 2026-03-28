@@ -9,9 +9,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
@@ -29,25 +32,29 @@ public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable 
     public static final int MAXIMAL_WINNING_NUMBERS = 6;
     public static final String RANDOM_NUMBER_SERVICE_PATH = "/api/v1.0/random";
     private static final int MAX_RETRIES = 10;
-    private final RestTemplate restTemplate;
 
+    private final RestTemplate restTemplate;
     private final RandomGeneratorClientConfigProperties properties;
 
     @Override
     public SixRandomNumbersDto generateSixRandomNumbers(int lowerBand, int upperBand) {
         log.info("Started fetching winning numbers using http client");
 
-        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-            ResponseEntity<List<Integer>> response = makeGetRequest(lowerBand, upperBand);
-            Set<Integer> sixDistinctNumbers = getSixRandomDistinctNumbers(response);
-            if (sixDistinctNumbers.size() == MAXIMAL_WINNING_NUMBERS) {
-                return new SixRandomNumbersDto(sixDistinctNumbers);
-            } else {
-                log.warn("Set is less than: {} Have to request one more time", MAXIMAL_WINNING_NUMBERS);
+        try {
+            for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                ResponseEntity<List<Integer>> response = makeGetRequest(lowerBand, upperBand);
+                Set<Integer> sixDistinctNumbers = getSixRandomDistinctNumbers(response);
+                if (sixDistinctNumbers.size() == MAXIMAL_WINNING_NUMBERS) {
+                    return new SixRandomNumbersDto(sixDistinctNumbers);
+                } else {
+                    log.warn("Set is less than: {} Have to request one more time", MAXIMAL_WINNING_NUMBERS);
+                }
             }
-        }
 
-        throw new IllegalStateException("Unable to generate six random numbers. Number of attempts: %d".formatted(MAX_RETRIES));
+            throw new IllegalStateException("Unable to generate six random numbers. Number of attempts: %d".formatted(MAX_RETRIES));
+        } catch (ResourceAccessException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private ResponseEntity<List<Integer>> makeGetRequest(int lowerBand, int upperBand) {
@@ -56,6 +63,7 @@ public class RandomNumberGeneratorRestTemplate implements RandomNumberGenerable 
                 .queryParam("max", upperBand)
                 .queryParam("count", MAXIMAL_WINNING_NUMBERS)
                 .toUriString();
+
         return restTemplate.exchange(
                 url,
                 HttpMethod.GET,
