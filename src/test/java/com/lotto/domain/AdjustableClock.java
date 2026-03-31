@@ -4,7 +4,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,15 +35,10 @@ public class AdjustableClock extends Clock {
 
     @Override
     public Clock withZone(ZoneId zone) {
-        if (zone.equals(this.zone)) {  // intentional NPE
+        if (zone.equals(this.zone)) {
             return this;
         }
         return new AdjustableClock(instant, zone);
-    }
-
-    @Override
-    public long millis() {
-        return instant().toEpochMilli();
     }
 
     @Override
@@ -52,30 +46,8 @@ public class AdjustableClock extends Clock {
         return instant;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof AdjustableClock other
-                && instant.equals(other.instant)
-                && zone.equals(other.zone);
-    }
-
-    @Override
-    public int hashCode() {
-        return instant.hashCode() ^ zone.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "AdjustableClock[" + instant + "," + zone + "]";
-    }
-
     public void advanceInTimeBy(Duration clockOffset) {
         this.instant = instant.plus(clockOffset);
-    }
-
-    public void plusDays(int days) {
-        Duration offset = Duration.ofDays(days);
-        advanceInTimeBy(offset);
     }
 
     public void plusDaysAndMinutes(int days, int minutes) {
@@ -84,20 +56,4 @@ public class AdjustableClock extends Clock {
         Duration ofMinutes = Duration.ofMinutes(minutes);
         advanceInTimeBy(ofMinutes);
     }
-
-    public void setClockToLocalDateTime(LocalDateTime localDateTime) {
-        ZonedDateTime zoneDateTime = createZoneDateTime(localDateTime.toLocalDate(), localDateTime.toLocalTime(), zone);
-        this.instant = zoneDateTime.toInstant();
-    }
-
-    public void setClockToLocalDate(LocalDate localDate) {
-        LocalDateTime localDateTime = LocalDateTime.of(localDate, LocalTime.now(this));
-        setClockToLocalDateTime(localDateTime);
-    }
-
-    public void setClockToLocalTime(LocalTime localTime) {
-        LocalDateTime localDateTime = LocalDateTime.of(LocalDate.now(this), localTime);
-        setClockToLocalDateTime(localDateTime);
-    }
-
 }

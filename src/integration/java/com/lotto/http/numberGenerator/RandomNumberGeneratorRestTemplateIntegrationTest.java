@@ -65,8 +65,7 @@ public class RandomNumberGeneratorRestTemplateIntegrationTest {
 
         // then
         assertThatThrownBy(() -> randomNumberGenerator.generateSixRandomNumbers(1, 99))
-                .hasMessageContaining("Connection reset");
-
+                .isInstanceOf(ResponseStatusException.class);
     }
 
     @Test
