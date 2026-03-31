@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -68,8 +69,79 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
         assertThat(winningNumbersDto.winningNumbers())
                 .isEqualTo(winningNumbers);
 
-        // step 3: /result/recent returns 404 and response: "No winning numbers found for draw date: 2025-12-13T19:00:00Z"
-        mockMvc.perform(get("/result/recent"))
+
+        //step 3: user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned UNAUTHORIZED(401)
+        // given & when
+        ResultActions failedLoginRequest = mockMvc.perform(post("/token")
+                .content("""
+                        {
+                        "username": "someUser",
+                        "password": "somePassword"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        // then
+        failedLoginRequest.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
+                .andExpect(content().json("""
+                        {
+                        "message": "Bad credentials",
+                        "status": "UNAUTHORIZED"
+                        }
+                        """.trim()));
+
+        //step 4: user made GET /result/recent with no jwt token and system returned UNAUTHORIZED(401)
+        // given & when
+        ResultActions failedGetOffersRequest = mockMvc.perform(get("/result/recent")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        // then
+        failedGetOffersRequest.andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+
+        //step 5: user made POST /register with username=someUser, password=somePassword and system registered user with status CREATED(201)
+        // when & then
+        mockMvc.perform(post("/register")
+                        .content("""
+                                {
+                                "username": "someUser",
+                                "password": "somePassword"
+                                }
+                                """.trim())
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("someUser"))
+                .andExpect(jsonPath("$.created").value(true))
+                .andExpect(jsonPath("$.id").exists());
+
+        //step 6: user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned OK(200) and jwttoken=AAAA.BBBB.CCC
+        // given & when
+        ResultActions successLoginRequest = mockMvc.perform(post("/token")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content("""
+                        {
+                        "username": "someUser",
+                        "password": "somePassword"
+                        }
+                        """.trim())
+        );
+
+        String loginResponseJson = successLoginRequest
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("someUser"))
+                .andExpect(jsonPath("$.token").exists())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String token = JsonPath.read(loginResponseJson, "$.token");
+
+        assertThat(token).matches(Pattern.compile("^([A-Za-z0-9-_=]+\\.)+([A-Za-z0-9-_=])+\\.?$"));
+
+        // step 7: /result/recent with header “Authorization: Bearer AAAA.BBBB.CCC” returns 404 and response: "No winning numbers found for draw date: 2025-12-13T19:00:00Z"
+        mockMvc.perform(get("/result/recent")
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
                 .andExpect(
                         content().json(
@@ -85,6 +157,7 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
         // step 4: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 14-12-2025 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:20.12.2025 20:00 (Saturday))
         // when & then
         ResultActions perform = mockMvc.perform(post("/inputNumbers")
+                        .header("Authorization", "Bearer " + token)
                         .content("""
                                 {
                                 "inputNumbers": [1,2,3,4,5,6]
@@ -103,7 +176,8 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
 
         //    step 5: user made GET /result/notExistingId and system returned 200 and body with message "No ticket with this hash found"
         // when
-        ResultActions performGetResultsWithNotExistingId = mockMvc.perform(get("/result/" + "nonExistingId"));
+        ResultActions performGetResultsWithNotExistingId = mockMvc.perform(get("/result/" + "nonExistingId")
+                .header("Authorization", "Bearer " + token));
 
         performGetResultsWithNotExistingId.andExpect(status().isOk())
                 .andExpect(content().json(
@@ -122,47 +196,52 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
 
         //    step 6: user made GET /result/hash and system returned 200 and body with message It is before draw date
         // when & then
-        mockMvc.perform(get("/result/" + hash)).andExpect(
-                content().json(
-                        """
-                                {
-                                  "response": {
-                                    "hash": %s,
-                                    "numbers": [1, 2, 3, 4, 5, 6],
-                                    "winningNumbers": %s,
-                                    "drawDate": "2025-12-20T19:00:00Z",
-                                    "isWon": false
-                                  },
-                                  "message": "It is before draw date"
-                                }
-                                """.trim().formatted(hash, winningNumbers)
-                )
-        );
+        mockMvc.perform(get("/result/" + hash)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(
+                        content().json(
+                                """
+                                        {
+                                          "response": {
+                                            "hash": %s,
+                                            "numbers": [1, 2, 3, 4, 5, 6],
+                                            "winningNumbers": %s,
+                                            "drawDate": "2025-12-20T19:00:00Z",
+                                            "isWon": false
+                                          },
+                                          "message": "It is before draw date"
+                                        }
+                                        """.trim().formatted(hash, winningNumbers)
+                        )
+                );
 
         //    step 7: 6 days and 31 minutes passed, and it is 1 minute after the draw date (20.12.2025 20:01)
         // given
         adjustableClock().plusDaysAndMinutes(6, 31);
 
         // when & then
-        mockMvc.perform(get("/result/" + hash)).andExpect(
-                content().json(
-                        """
-                                {
-                                  "response": {
-                                    "hash": "%s",
-                                    "numbers": [1, 2, 3, 4, 5, 6],
-                                    "winningNumbers": [1, 2, 3, 4, 5, 6],
-                                    "drawDate": "2025-12-20T19:00:00Z",
-                                    "isWon": true
-                                  },
-                                  "message": "Ticket has won"
-                                }
-                                """.trim().formatted(hash)
-                )
-        );
+        mockMvc.perform(get("/result/" + hash)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(
+                        content().json(
+                                """
+                                        {
+                                          "response": {
+                                            "hash": "%s",
+                                            "numbers": [1, 2, 3, 4, 5, 6],
+                                            "winningNumbers": [1, 2, 3, 4, 5, 6],
+                                            "drawDate": "2025-12-20T19:00:00Z",
+                                            "isWon": true
+                                          },
+                                          "message": "Ticket has won"
+                                        }
+                                        """.trim().formatted(hash)
+                        )
+                );
 
         // step 8: /result/recent returns now body with recent winning numbers
-        mockMvc.perform(get("/result/recent"))
+        mockMvc.perform(get("/result/recent")
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(
                         content().json(

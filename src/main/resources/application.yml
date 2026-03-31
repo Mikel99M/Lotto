@@ -28,6 +28,9 @@ lotto:
     lotteryRunOccurrence: "0 0 20 * * */6"
     checkingLotterryResultsOccurrence: "0 1 20 * * */6"
 
-
-
+auth:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-days: 30
+    issuer: Lotto Service
 
