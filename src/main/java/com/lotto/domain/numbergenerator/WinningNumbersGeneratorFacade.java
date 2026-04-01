@@ -5,6 +5,8 @@ import com.lotto.domain.general.HashGenerable;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -27,6 +29,7 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     private final Clock clock;
     private final ZoneId businessZone;
 
+    @CacheEvict(value = "recentWinningNumbers", allEntries = true)
     public WinningNumbersDto generate() {
         ZonedDateTime now = clock.instant().atZone(businessZone);
         Instant drawDate = drawDateGenerator.generateNextDrawDate(now.toInstant());
@@ -58,6 +61,7 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
         return winningNumbersMapper.mapWinningNumbersToWinningNumbersDto(winningNumbers);
     }
 
+    @Cacheable(value = "recentWinningNumbers")
     public WinningNumbersDto retrieveMostRecentWinningNumbersDto() {
         ZonedDateTime now = clock.instant().atZone(businessZone);
         ZonedDateTime previousWeekDate = now.minusWeeks(1);

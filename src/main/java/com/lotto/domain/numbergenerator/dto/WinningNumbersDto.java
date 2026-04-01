@@ -2,6 +2,7 @@ package com.lotto.domain.numbergenerator.dto;
 
 import lombok.Builder;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 
@@ -9,5 +10,5 @@ import java.util.Set;
 public record WinningNumbersDto(
         Set<Integer> winningNumbers,
         Instant date
-) {
+) implements Serializable {
 }

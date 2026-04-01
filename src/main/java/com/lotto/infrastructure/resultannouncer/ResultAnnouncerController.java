@@ -1,7 +1,6 @@
 package com.lotto.infrastructure.resultannouncer;
 
 import com.lotto.domain.numbergenerator.WinningNumbersGeneratorFacade;
-import com.lotto.domain.numbergenerator.WinningNumbersRepository;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import com.lotto.domain.resultannouncer.ResultAnnouncerFacade;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
@@ -19,7 +18,6 @@ public class ResultAnnouncerController {
 
     private final ResultAnnouncerFacade facade;
     private final WinningNumbersGeneratorFacade generatorFacade;
-    private final WinningNumbersRepository winningNumbersRepository;
 
     @GetMapping("/result/{hash}")
     public ResponseEntity<ResultAnnouncerResponseDto> checkResult(@PathVariable String hash) {

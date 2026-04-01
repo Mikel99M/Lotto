@@ -11,6 +11,14 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
 
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:63792}
+  cache:
+    type: redis
+    redis:
+      time-to-live: PT10S
+
 lotto:
   time:
     timeZone: "Europe/Warsaw"
