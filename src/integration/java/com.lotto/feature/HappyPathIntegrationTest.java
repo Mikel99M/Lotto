@@ -3,6 +3,8 @@ package com.lotto.feature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.jayway.jsonpath.JsonPath;
 import com.lotto.BaseIntegrationTest;
+import com.lotto.IntegrationConfiguration;
+import com.lotto.LottoApplication;
 import com.lotto.domain.AdjustableClock;
 import com.lotto.domain.numbergenerator.WinningNumbersGeneratorFacade;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
@@ -10,6 +12,7 @@ import com.lotto.domain.resultchecker.dto.ResultDto;
 import com.lotto.infrastructure.resultchecker.scheduler.ResultCheckerScheduler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest(classes = {LottoApplication.class, IntegrationConfiguration.class}, properties = {"spring.cache.type=none"})
 public class HappyPathIntegrationTest extends BaseIntegrationTest {
 
     private final Set<Integer> winningNumbers = Set.of(1, 2, 3, 4, 5, 6);
@@ -89,50 +93,22 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
 
         //step 4: user made GET /result/recent with no jwt token and system returned UNAUTHORIZED(401)
         // given & when
-        ResultActions failedGetOffersRequest = mockMvc.perform(get("/result/recent")
+        ResultActions failedGetRecentResultRequest = mockMvc.perform(get("/result/recent")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
 
         // then
-        failedGetOffersRequest.andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+        failedGetRecentResultRequest.andExpect(status().is(HttpStatus.FORBIDDEN.value()));
 
         //step 5: user made POST /register with username=someUser, password=somePassword and system registered user with status CREATED(201)
         // when & then
-        mockMvc.perform(post("/register")
-                        .content("""
-                                {
-                                "username": "someUser",
-                                "password": "somePassword"
-                                }
-                                """.trim())
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.username").value("someUser"))
-                .andExpect(jsonPath("$.created").value(true))
-                .andExpect(jsonPath("$.id").exists());
+        registerTestUser();
 
         //step 6: user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned OK(200) and jwttoken=AAAA.BBBB.CCC
         // given & when
-        ResultActions successLoginRequest = mockMvc.perform(post("/token")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content("""
-                        {
-                        "username": "someUser",
-                        "password": "somePassword"
-                        }
-                        """.trim())
-        );
+        String token = loginInTestUserAndGetToken();
 
-        String loginResponseJson = successLoginRequest
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("someUser"))
-                .andExpect(jsonPath("$.token").exists())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        String token = JsonPath.read(loginResponseJson, "$.token");
-
+        // then
         assertThat(token).matches(Pattern.compile("^([A-Za-z0-9-_=]+\\.)+([A-Za-z0-9-_=])+\\.?$"));
 
         // step 7: /result/recent with header “Authorization: Bearer AAAA.BBBB.CCC” returns 404 and response: "No winning numbers found for draw date: 2025-12-13T19:00:00Z"

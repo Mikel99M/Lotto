@@ -16,7 +16,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-
 public class RandomNumberGeneratorRestTemplateIntegrationTest {
 
     @RegisterExtension
