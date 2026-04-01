@@ -10,11 +10,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest(classes = {LottoApplication.class, IntegrationConfiguration.class}, properties = "spring.task.scheduling.enabled: false")
 @ActiveProfiles({"integration"})
@@ -43,6 +45,11 @@ public class BaseIntegrationTest {
         registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
         registry.add("lotto.number-generator.http.client.config.port", () -> wireMockServer.getPort());
         registry.add("lotto.number-generator.http.client.config.uri", () -> WIRE_MOCK_HOST);
+    }
+
+    public ResultActions performGetActionWithToken(String url, String token) throws Exception {
+        return mockMvc.perform(get(url)
+                .header("Authorization", "Bearer " + token));
     }
 
 }

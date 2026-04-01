@@ -46,7 +46,6 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void testHappyScenarioWhereUserWins() throws Exception {
-
         //    step 1: external service returns 6 random numbers (1,2,3,4,5,6)
         // given
         wireMockServer.stubFor(
@@ -63,12 +62,9 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                                 )));
 
         // step 2: system fetched winning numbers for draw date:
-        WinningNumbersDto winningNumbersDto =
-                winningNumbersGeneratorFacade.generate();
+        WinningNumbersDto winningNumbersDto = winningNumbersGeneratorFacade.generate();
 
-        assertThat(winningNumbersDto.winningNumbers())
-                .isEqualTo(winningNumbers);
-
+        assertThat(winningNumbersDto.winningNumbers()).isEqualTo(winningNumbers);
 
         //step 3: user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned UNAUTHORIZED(401)
         // given & when
@@ -140,21 +136,20 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
         assertThat(token).matches(Pattern.compile("^([A-Za-z0-9-_=]+\\.)+([A-Za-z0-9-_=])+\\.?$"));
 
         // step 7: /result/recent with header “Authorization: Bearer AAAA.BBBB.CCC” returns 404 and response: "No winning numbers found for draw date: 2025-12-13T19:00:00Z"
-        mockMvc.perform(get("/result/recent")
-                        .header("Authorization", "Bearer " + token))
+        performGetActionWithToken("/result/recent", token)
                 .andExpect(status().isNotFound())
                 .andExpect(
                         content().json(
                                 """
-                                                {
-                                                  "response": "No winning numbers found for draw date: 2025-12-13T19:00:00Z",
-                                                  "status": "NOT_FOUND"
-                                                }
+                                                        {
+                                                          "response": "No winning numbers found for draw date: 2025-12-13T19:00:00Z",
+                                                          "status": "NOT_FOUND"
+                                                        }
                                         """.trim()
                         )
                 );
 
-        // step 4: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 14-12-2025 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:20.12.2025 20:00 (Saturday))
+        // step 8: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 14-12-2025 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:20.12.2025 20:00 (Saturday))
         // when & then
         ResultActions perform = mockMvc.perform(post("/inputNumbers")
                         .header("Authorization", "Bearer " + token)
@@ -174,10 +169,10 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
         String json = perform.andReturn().getResponse().getContentAsString();
         String hash = JsonPath.read(json, "$.hash");
 
-        //    step 5: user made GET /result/notExistingId and system returned 200 and body with message "No ticket with this hash found"
+        //    step 9: user made GET /result/notExistingId and system returned 200 and body with message "No ticket with this hash found"
         // when
-        ResultActions performGetResultsWithNotExistingId = mockMvc.perform(get("/result/" + "nonExistingId")
-                .header("Authorization", "Bearer " + token));
+        ResultActions performGetResultsWithNotExistingId =
+                performGetActionWithToken("/result/" + "nonExistingId", token);
 
         performGetResultsWithNotExistingId.andExpect(status().isOk())
                 .andExpect(content().json(
@@ -194,10 +189,9 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                                 """.trim()
                 ));
 
-        //    step 6: user made GET /result/hash and system returned 200 and body with message It is before draw date
+        //    step 10: user made GET /result/hash and system returned 200 and body with message It is before draw date
         // when & then
-        mockMvc.perform(get("/result/" + hash)
-                        .header("Authorization", "Bearer " + token))
+        performGetActionWithToken("/result/" + hash, token)
                 .andExpect(
                         content().json(
                                 """
@@ -215,13 +209,12 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                         )
                 );
 
-        //    step 7: 6 days and 31 minutes passed, and it is 1 minute after the draw date (20.12.2025 20:01)
+        //    step 11: 6 days and 31 minutes passed, and it is 1 minute after the draw date (20.12.2025 20:01)
         // given
         adjustableClock().plusDaysAndMinutes(6, 31);
 
         // when & then
-        mockMvc.perform(get("/result/" + hash)
-                        .header("Authorization", "Bearer " + token))
+        performGetActionWithToken("/result/" + hash, token)
                 .andExpect(
                         content().json(
                                 """
@@ -239,9 +232,8 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                         )
                 );
 
-        // step 8: /result/recent returns now body with recent winning numbers
-        mockMvc.perform(get("/result/recent")
-                        .header("Authorization", "Bearer " + token))
+        // step 12: /result/recent returns now body with recent winning numbers
+        performGetActionWithToken("/result/recent", token)
                 .andExpect(status().isOk())
                 .andExpect(
                         content().json(
@@ -254,7 +246,7 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                         )
                 );
 
-        // step 9: resultCheckerScheduler generated ResultDto with winning tickets
+        // step 13: resultCheckerScheduler generated ResultDto with winning tickets
         // given & when
         ResultDto result = resultCheckerScheduler.run();
 
