@@ -147,6 +147,7 @@
     </dependencies>
 
     <build>
+        <finalName>lotto</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
