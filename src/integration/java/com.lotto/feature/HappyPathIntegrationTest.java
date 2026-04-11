@@ -239,5 +239,21 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                 },
                 () -> assertThat(result.drawDate()).isEqualTo(Instant.parse("2025-12-20T19:00:00Z"))
         );
+
+        // step 14: User retrieved all tickets he won and system returned him info about one ticket
+        performGetActionWithToken("/tickets", token)
+                .andExpect(status().isOk())
+                .andExpect(
+                        content().json(
+                                """
+                                        [
+                                        {"hash":"%s",
+                                        "purchaseDate":"2025-12-14T18:30:00Z",
+                                        "drawDate":"2025-12-20T19:00:00Z",
+                                        "numbers":[1,2,3,4,5,6]}
+                                        ]
+                                        """.trim().formatted(hash)
+                        )
+                );
     }
 }

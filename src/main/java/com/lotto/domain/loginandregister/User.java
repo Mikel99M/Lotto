@@ -33,10 +33,6 @@ record User(
         return userName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;

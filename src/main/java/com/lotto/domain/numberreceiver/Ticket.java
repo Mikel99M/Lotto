@@ -15,6 +15,5 @@ record Ticket(
         @Indexed(unique = true) String hash,
         Instant purchaseDate,
         Instant drawDate,
-        Set<Integer> numbersFromUser) {
-
-}
+        Set<Integer> numbersFromUser,
+        String ownerUserName) {}

@@ -36,7 +36,7 @@ public class LoginAndRegisterFacade {
     public UserDto findByUserName(String userName) {
         User user = userRepository.findByUserName(userName).orElseThrow(() -> new BadCredentialsException("User with user username \"%s\" not found.".formatted(userName)));
         return UserDto.builder()
-                .email(user.getEmail())
+                .email(user.email())
                 .name(user.getUsername())
                 .password(user.getPassword())
                 .build();
@@ -45,7 +45,7 @@ public class LoginAndRegisterFacade {
     public UserDto findByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new BadCredentialsException("User with email \"%s\" not found.".formatted(email)));
         return UserDto.builder()
-                .email(user.getEmail())
+                .email(user.email())
                 .name(user.getUsername())
                 .build();
     }

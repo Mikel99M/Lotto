@@ -9,7 +9,7 @@ import java.util.Set;
 
 public interface NumberReceiver {
 
-    InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser);
+    InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser, String userName);
 
     List<TicketDto> fetchAllTicketDtos(Instant date);
 

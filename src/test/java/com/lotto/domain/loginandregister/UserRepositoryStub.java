@@ -34,13 +34,13 @@ class UserRepositoryStub implements UserRepository {
 
     @Override
     public User save(User user) {
-        database.put(user.getEmail(), user);
+        database.put(user.email(), user);
         return user;
     }
 
     @Override
     public void delete(User user) {
-        database.remove(user.getEmail());
+        database.remove(user.email());
     }
 
     @Override
@@ -135,7 +135,6 @@ class UserRepositoryStub implements UserRepository {
 
     @Override
     public void deleteById(final String s) {
-
     }
 
     @Override

@@ -26,7 +26,7 @@ public class NumberReceiverFacadeStub implements NumberReceiver {
     }
 
     @Override
-    public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser) {
+    public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser, String userName) {
         return null;
     }
 

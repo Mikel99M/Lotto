@@ -36,6 +36,13 @@ class TicketRepositoryImplementation implements TicketRepository {
     }
 
     @Override
+    public List<Ticket> findAllByOwnerUserName(final String ownerUserName) {
+        return tickets.values().stream()
+                .filter(ticket -> ticket.ownerUserName().equals(ownerUserName))
+                .toList();
+    }
+
+    @Override
     public <S extends Ticket> S insert(final S entity) {
         return null;
     }

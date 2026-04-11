@@ -25,7 +25,7 @@ public class NumberReceiverFacade implements NumberReceiver {
     private final Clock clock;
     private final ZoneId businessZone;
 
-    public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser) {
+    public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser, String userName) {
         boolean areAllNumbersInRange = areNumbersCorrectAndInRange(numbersFromUser);
         Instant now = Instant.now(clock);
         if (areAllNumbersInRange) {
@@ -36,6 +36,7 @@ public class NumberReceiverFacade implements NumberReceiver {
                     .numbersFromUser(numbersFromUser)
                     .drawDate(drawDate)
                     .purchaseDate(now)
+                    .ownerUserName(userName)
                     .build());
 
             return InputNumberResultDto.builder()
@@ -60,7 +61,7 @@ public class NumberReceiverFacade implements NumberReceiver {
         List<Ticket> allTicketsByDrawDate = repository.findAllTicketsByDrawDate(date);
         return allTicketsByDrawDate
                 .stream()
-                .map(TicketMapper::mapFromTicket)
+                .map(TicketMapper::mapFromTicketToTicketDto)
                 .toList();
     }
 
@@ -83,5 +84,12 @@ public class NumberReceiverFacade implements NumberReceiver {
 
     public String generateHash() {
         return hashGenerator.generateHash();
+    }
+
+    public List<TicketDto> retrieveAllTicketsByUsername(String username) {
+        return repository.findAllByOwnerUserName(username)
+                .stream()
+                .map(TicketMapper::mapFromTicketToTicketDto)
+                .toList();
     }
 }

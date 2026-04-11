@@ -26,6 +26,7 @@ class NumberReceiverFacadeTest {
     private final ZoneId businessZone = ZoneId.of("Europe/Warsaw");
     private final Instant fixedDate = ZonedDateTime.of(2025, 11, 5, 15, 30, 0, 0, businessZone).toInstant();
     private Clock clock = Clock.fixed(fixedDate, businessZone);
+    private final String UserName = "name";
 
     private final DrawDateGenerator dateGenerator = new DrawDateGenerator(businessZone);
 
@@ -44,7 +45,7 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5, 6);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result.message()).isEqualTo("success");
@@ -59,14 +60,13 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, 100, 5, 6);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.message()).isEqualTo("failed");
         assertThat(result.drawDate()).isNull();
         assertThat(result.hash()).isNull();
-
     }
 
     @Test
@@ -75,7 +75,7 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, -50, 5, 6);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result).isNotNull();
@@ -90,7 +90,7 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result).isNotNull();
@@ -106,7 +106,7 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5, 6, 7);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result).isNotNull();
@@ -121,11 +121,10 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbers = Set.of(1, 2, 3, 4, 5, 6);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result.hash()).isEqualTo("hash-test");
-
     }
 
     @Test
@@ -138,7 +137,7 @@ class NumberReceiverFacadeTest {
         ZonedDateTime nextDrawDate = nextSaturday.withHour(20).withMinute(0).withSecond(0).withNano(0);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result.drawDate()).isEqualTo(nextDrawDate);
@@ -162,7 +161,7 @@ class NumberReceiverFacadeTest {
                 .withHour(20).withMinute(0).withSecond(0).withNano(0);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result.message()).isEqualTo("success");
@@ -193,7 +192,7 @@ class NumberReceiverFacadeTest {
         ZonedDateTime nextDrawDate = nextSaturday.withHour(20).withMinute(0).withSecond(0).withNano(0);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         // then
         assertThat(result.message()).isEqualTo("success");
@@ -221,7 +220,7 @@ class NumberReceiverFacadeTest {
         ZonedDateTime drawDate = ZonedDateTime.of(2025, 11, 15, 20, 0, 0, 0, businessZone);
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         List<TicketDto> tickets = facade.fetchAllTicketDtos(drawDate.toInstant());
 
@@ -264,7 +263,7 @@ class NumberReceiverFacadeTest {
         Instant drawDate = ZonedDateTime.of(2025, 11, 16, 20, 0, 0, 0, businessZone).toInstant();
 
         // when
-        InputNumberResultDto result = facade.inputNumbers(numbers);
+        InputNumberResultDto result = facade.inputNumbers(numbers, UserName);
 
         List<TicketDto> tickets = facade.fetchAllTicketDtos(drawDate);
 
@@ -302,6 +301,42 @@ class NumberReceiverFacadeTest {
                 TicketNotFoundException.class,
                 () -> facade.fetchTicketByHash("test hash")
         );
+    }
+
+    @Test
+    public void retrieveAllTicketsByUsername_should_return_empty_list_when_there_were_no_tickets_bought() {
+        // when & then
+        assertThat(facade.retrieveAllTicketsByUsername("userName")).isEmpty();
+    }
+
+    @Test
+    public void retrieveAllTicketsByUsername_should_return_list_with_two_TicketDtos() {
+        // given
+        Ticket ticket1 = Ticket.builder()
+                .hash("test hash1")
+                .ownerUserName("userName")
+                .build();
+
+        Ticket ticket2 = Ticket.builder()
+                .ownerUserName("userName")
+                .build();
+
+        ticketRepository.save(ticket1);
+        ticketRepository.save(ticket2);
+
+        TicketDto ticketDto1 = TicketDto.builder()
+                .hash("test hash1")
+                .build();
+
+        TicketDto ticketDto2 = TicketDto.builder()
+                .build();
+
+        // when
+        List<TicketDto> result = facade.retrieveAllTicketsByUsername("userName");
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactlyInAnyOrder(ticketDto1, ticketDto2);
     }
 
 }

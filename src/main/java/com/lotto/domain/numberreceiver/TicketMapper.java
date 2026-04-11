@@ -4,7 +4,7 @@ import com.lotto.domain.numberreceiver.dto.TicketDto;
 
 class TicketMapper {
 
-    public static TicketDto mapFromTicket(Ticket ticket) {
+    public static TicketDto mapFromTicketToTicketDto(Ticket ticket) {
         return TicketDto.builder()
                 .hash(ticket.hash())
                 .purchaseDate(ticket.purchaseDate())

@@ -6,10 +6,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-public interface TicketRepository extends MongoRepository<Ticket, String> {
+interface TicketRepository extends MongoRepository<Ticket, String> {
 
     List<Ticket> findAllTicketsByDrawDate(Instant drawDate);
 
     Optional<Ticket> findByHash(String hash);
 
+    List<Ticket> findAllByOwnerUserName(String ownerUserName);
 }
