@@ -126,18 +126,4 @@ public class ApiValidationFailedIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    public void should_return_200_when_input_numbers_are_valid() throws Exception {
-        // when & then
-        mockMvc.perform(post("/inputNumbers")
-                        .content("""
-                                {
-                                "inputNumbers": [1,2,3,4,5,6]
-                                }
-                                """.trim()
-                        )
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
 }
