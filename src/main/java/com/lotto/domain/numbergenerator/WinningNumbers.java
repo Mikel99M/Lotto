@@ -12,8 +12,6 @@ import java.util.Set;
 @Document(collection = "winning numbers")
 public record WinningNumbers(
         @Id String id,
-        @Indexed(unique = true) String hash,
         Set<Integer> numbers,
-        Instant date) {
-
-}
+        @Indexed(unique = true) Instant date
+) {}

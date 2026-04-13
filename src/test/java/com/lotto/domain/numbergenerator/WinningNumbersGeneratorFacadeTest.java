@@ -1,7 +1,5 @@
 package com.lotto.domain.numbergenerator;
 
-import com.lotto.domain.general.HashGenerable;
-import com.lotto.domain.general.HashGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import com.lotto.domain.stub.DrawDateGeneratorStub;
 import com.lotto.domain.stub.NumbersGeneratorStub;
@@ -28,14 +26,13 @@ class WinningNumbersGeneratorFacadeTest {
     NumbersGeneratorStub numbersGeneratorStub = new NumbersGeneratorStub();
     DrawDateGeneratorStub drawDateGeneratorStub = new DrawDateGeneratorStub(zoneId);
     WinningNumbersMapper winningNumbersMapper = new WinningNumbersMapper();
-    HashGenerable hashGenerator = new HashGenerator();
 
     WinningNumbersGeneratorFacadeConfigurationProperties properties = WinningNumbersGeneratorFacadeConfigurationProperties.builder()
             .lowerBand(1)
                 .upperBand(99)
                 .build();
 
-    WinningNumbersGeneratorFacade facade = new WinningNumbersGeneratorFacade(repository, numbersGeneratorStub, winningNumbersMapper, hashGenerator, drawDateGeneratorStub, properties, clock, zoneId);
+    WinningNumbersGeneratorFacade facade = new WinningNumbersGeneratorFacade(repository, numbersGeneratorStub, winningNumbersMapper, drawDateGeneratorStub, properties, clock, zoneId);
 
     @Test
     public void should_return_correct_result() {

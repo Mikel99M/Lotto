@@ -1,7 +1,6 @@
 package com.lotto.domain.numbergenerator;
 
 import com.lotto.domain.general.DrawDateGenerator;
-import com.lotto.domain.general.HashGenerable;
 import com.lotto.domain.general.WinningNumbersGenerator;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,6 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     private final WinningNumbersRepository winningNumbersRepository;
     private final RandomNumberGenerable numbersGenerator;
     private final WinningNumbersMapper winningNumbersMapper;
-    private final HashGenerable hashGenerator;
     private final DrawDateGenerator drawDateGenerator;
     private final WinningNumbersGeneratorFacadeConfigurationProperties properties;
     private final Clock clock;
@@ -40,11 +38,9 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
             return new WinningNumbersDto(wn.numbers(), wn.date());
         }
 
-        String hash = hashGenerator.generateHash();
         SixRandomNumbersDto dto = numbersGenerator.generateSixRandomNumbers(properties.lowerBand(), properties.upperBand());
 
         WinningNumbers winningNumbers = new WinningNumbers.WinningNumbersBuilder()
-                .hash(hash)
                 .numbers(dto.numbers())
                 .date(drawDate)
                 .build();
