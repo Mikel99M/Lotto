@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -33,20 +33,25 @@ public class WinningNumbersGeneratorFacade implements WinningNumbersGenerator {
     public WinningNumbersDto generate() {
         ZonedDateTime now = clock.instant().atZone(businessZone);
         Instant drawDate = drawDateGenerator.generateNextDrawDate(now.toInstant());
+
+        Optional<WinningNumbers> existing = winningNumbersRepository.findWinningNumbersByDate(drawDate);
+        if (existing.isPresent()) {
+            WinningNumbers wn = existing.get();
+            return new WinningNumbersDto(wn.numbers(), wn.date());
+        }
+
         String hash = hashGenerator.generateHash();
         SixRandomNumbersDto dto = numbersGenerator.generateSixRandomNumbers(properties.lowerBand(), properties.upperBand());
-        Set<Integer> winningNums = dto.numbers();
 
         WinningNumbers winningNumbers = new WinningNumbers.WinningNumbersBuilder()
                 .hash(hash)
-                .numbers(winningNums)
+                .numbers(dto.numbers())
                 .date(drawDate)
                 .build();
-        WinningNumbers savedNumbers = winningNumbersRepository.save(winningNumbers);
-        return new WinningNumbersDto(
-                savedNumbers.numbers(),
-                savedNumbers.date()
-        );
+
+        WinningNumbers saved = winningNumbersRepository.save(winningNumbers);
+
+        return new WinningNumbersDto(saved.numbers(), saved.date());
     }
 
     public List<WinningNumbersDto> retrieveAllWinningNumbersDtos() {
