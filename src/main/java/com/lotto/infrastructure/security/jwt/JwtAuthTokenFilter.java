@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.AllArgsConstructor;
-import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -23,28 +22,37 @@ import java.util.Collections;
 public class JwtAuthTokenFilter extends OncePerRequestFilter {
 
     private final JwtConfigurationProperties properties;
-    private final Environment environment;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorization = request.getHeader("Authorization");
-        if (authorization == null) {
+
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = getUsernamePasswordAuthenticationToken(authorization);
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+        try {
+            UsernamePasswordAuthenticationToken authentication = getUsernamePasswordAuthenticationToken(authorization);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+        }
+
         filterChain.doFilter(request, response);
     }
 
-    private UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(String token) {
+    private UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(String authorization) {
         String secretKey = properties.secret();
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
+
         JWTVerifier verifier = JWT.require(algorithm)
-                // lleway for integration test
-                .acceptLeeway(354123123)
+                .acceptLeeway(354123123) // leeway dla testów
                 .build();
-        DecodedJWT jwt = verifier.verify(token.substring(7));
+
+        String token = authorization.substring(7);
+        DecodedJWT jwt = verifier.verify(token);
+
         return new UsernamePasswordAuthenticationToken(jwt.getSubject(), null, Collections.emptyList());
     }
 }

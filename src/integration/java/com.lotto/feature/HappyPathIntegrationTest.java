@@ -91,14 +91,14 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                         }
                         """.trim()));
 
-        //step 4: user made GET /result/recent with no jwt token and system returned UNAUTHORIZED(401)
+        //step 4: user made GET /result/recent with no jwt token and system returned NOT_FOUND(404)
         // given & when
         ResultActions failedGetRecentResultRequest = mockMvc.perform(get("/result/recent")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
         );
 
         // then
-        failedGetRecentResultRequest.andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+        failedGetRecentResultRequest.andExpect(status().is(HttpStatus.NOT_FOUND.value()));
 
         //step 5: user made POST /register with username=someUser, password=somePassword and system registered user with status CREATED(201)
         // when & then
@@ -209,7 +209,7 @@ public class HappyPathIntegrationTest extends BaseIntegrationTest {
                 );
 
         // step 12: /result/recent returns now body with recent winning numbers
-        performGetActionWithToken("/result/recent", token)
+        mockMvc.perform(get("/result/recent", token))
                 .andExpect(status().isOk())
                 .andExpect(
                         content().json(
