@@ -1,0 +1,44 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=${MONGO_AUTH_SOURCE}
+  main:
+    allow-bean-definition-overriding: true
+  task:
+    scheduling:
+      enabled: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+  cache:
+    type: redis
+    redis:
+      time-to-live: PT10S
+
+lotto:
+  time:
+    timeZone: "Europe/Warsaw"
+  number-generator:
+    facade:
+      lowerBand: 1
+      upperBand: 99
+    http:
+      client:
+        config:
+          uri: http://www.randomnumberapi.com
+          port: 80
+          connectionTimeout: 2000
+          readTimeout: 2000
+    lotteryRunOccurrence: "0 */2 * * * *"
+    checkingLotterryResultsOccurrence: "0 */2 * * * *"
+
+auth:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-days: 30
+    issuer: Lotto Service
+
