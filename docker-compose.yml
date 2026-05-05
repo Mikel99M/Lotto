@@ -2,13 +2,12 @@ services:
   mongo:
     image: mongo:4.0.10
     restart: always
-    ports:
-      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
       MONGO_INITDB_DATABASE: lotto-web
     volumes:
+      - mongo_data:/data/db
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
 
   mongo-express:
@@ -17,8 +16,8 @@ services:
     ports:
       - "8081:8081"
     environment:
-      ME_CONFIG_MONGODB_AUTH_USERNAME: root
-      ME_CONFIG_MONGODB_AUTH_PASSWORD: example
+      ME_CONFIG_MONGODB_AUTH_USERNAME: admin
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: admin
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
   redis:
@@ -43,12 +42,20 @@ services:
     ports:
       - '8080:8080'
     environment:
-      MONGO_USER: admin
-      MONGO_PASSWORD: admin
+      MONGO_USER: root
+      MONGO_PASSWORD: example
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       MONGO_DB_NAME: lotto-web
-      MONGO_AUTH_SOURCE: lotto-web
+      MONGO_AUTH_SOURCE: admin
       JWT_SECRET: secret
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
+
+  lotto-frontend:
+    container_name: lotto-frontend
+#    image: lottofrontend:latest
+    image: 384235570350.dkr.ecr.eu-central-1.amazonaws.com/lotto-front
+    restart: always
+    ports:
+      - '80:80'

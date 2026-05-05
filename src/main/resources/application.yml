@@ -33,8 +33,8 @@ lotto:
           port: 80
           connectionTimeout: 2000
           readTimeout: 2000
-    lotteryRunOccurrence: "0 0 20 * * */6"
-    checkingLotterryResultsOccurrence: "0 1 20 * * */6"
+    lotteryRunOccurrence: "0 0 20 * * SAT"
+    checkingLotterryResultsOccurrence: "0 1 20 * * SAT"
 
 auth:
   jwt:
