@@ -3,7 +3,7 @@
 A full-stack lottery system based on a micro-services architecture. The application allows users to register, play the lottery, and check results in real-time.
 
 Lotto Game deployed on AWS EC2:
-http://ec2-63-177-54-193.eu-central-1.compute.amazonaws.com
+http://ec2-63-179-100-176.eu-central-1.compute.amazonaws.com
 
 Backend endpoints presented on Swagger:
 http://ec2-63-179-100-176.eu-central-1.compute.amazonaws.com:8080/swagger-ui/index.html#/
